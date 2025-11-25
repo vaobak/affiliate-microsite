@@ -54,7 +54,13 @@ export default function ProductCard({ product, collectionId, theme = 'blue', sho
       product.name
     );
     
-    window.open(product.url, '_blank', 'noopener,noreferrer');
+    // Support multiple field names for affiliate link
+    const affiliateUrl = product.url || product.affiliate_link || product.affiliateLink;
+    if (affiliateUrl) {
+      window.open(affiliateUrl, '_blank', 'noopener,noreferrer');
+    } else {
+      console.error('No affiliate link found for product:', product);
+    }
   };
 
   const themeColors = getTheme(theme);

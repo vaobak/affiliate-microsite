@@ -251,10 +251,17 @@ Jika ada pertanyaan atau issue, silakan buat issue di repository ini.
 
 Made with ❤️ using React + Vite + Tailwind CSS + Cloudflare D1
 
-**Version:** 2.3.2 (Auto-Renumber)  
+**Version:** 2.3.3 (Affiliate Link Fix)  
 **Last Updated:** November 25, 2025
 
-## 🔢 **Latest Updates (v2.3.2)**
+## 🔗 **Latest Updates (v2.3.3)**
+
+### **Fixed: Affiliate Link Bug** 🐛
+- ✅ **Affiliate link sekarang tersimpan** - Field name mismatch fixed
+- ✅ **Product card bisa diklik** - Link opens correctly
+- ✅ **Edit product works** - Link loads and saves properly
+
+## 🔢 **Previous (v2.3.2)**
 
 ### **New: Auto-Renumber IDs** 🎯
 - ✅ **Sequential IDs** - Selalu berurutan 1, 2, 3, ...

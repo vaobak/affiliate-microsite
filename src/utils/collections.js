@@ -126,10 +126,13 @@ export async function updateProductInCollection(collectionId, productId, updates
 // Delete product from collection
 export async function deleteProductFromCollection(collectionId, productId) {
   try {
+    console.log('Deleting product:', productId, 'from collection:', collectionId);
     await api.deleteProduct(productId);
     
+    console.log('Product deleted, starting renumber...');
     // Auto-renumber products to keep sequential IDs
-    await api.renumberProductIds(collectionId);
+    const renumberResult = await api.renumberProductIds(collectionId);
+    console.log('Renumber result:', renumberResult);
     
     return true;
   } catch (error) {

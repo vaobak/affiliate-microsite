@@ -150,20 +150,27 @@ export async function resetProductIdSequence(collectionId) {
 // Renumber product IDs to be sequential (1, 2, 3, ...)
 export async function renumberProductIds(collectionId) {
   try {
+    console.log('[Renumber] Starting renumber for collection:', collectionId);
     const response = await fetch(`${API_BASE}/products/renumber`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ collectionId })
     });
+    
+    console.log('[Renumber] Response status:', response.status);
+    
     if (!response.ok) {
-      console.warn('Failed to renumber products');
-      return false;
+      const errorText = await response.text();
+      console.error('[Renumber] Failed:', response.status, errorText);
+      return { success: false, error: errorText };
     }
+    
     const data = await response.json();
+    console.log('[Renumber] Success:', data);
     return data;
   } catch (error) {
-    console.warn('Error renumbering products:', error);
-    return false;
+    console.error('[Renumber] Error:', error);
+    return { success: false, error: error.message };
   }
 }
 

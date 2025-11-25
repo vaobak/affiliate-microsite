@@ -42,7 +42,7 @@ export default function AddCollectionProduct() {
     try {
       addProductToCollection(collectionId, {
         name: name.trim(),
-        url: url.trim(),
+        affiliateLink: url.trim(), // Changed from 'url' to 'affiliateLink'
         category: category.trim() || 'Uncategorized',
         badge: badge.trim()
       });

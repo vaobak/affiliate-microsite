@@ -30,7 +30,8 @@ export default function EditCollectionProduct() {
         const product = await getProductFromCollection(collectionId, productId);
         if (product) {
           setName(product.name);
-          setUrl(product.url);
+          // Support both 'url' and 'affiliate_link' field names
+          setUrl(product.url || product.affiliate_link || product.affiliateLink || '');
           setCategory(product.category || '');
           setBadge(product.badge || '');
         } else {
@@ -58,7 +59,7 @@ export default function EditCollectionProduct() {
     try {
       updateProductInCollection(collectionId, parseInt(productId), {
         name: name.trim(),
-        url: url.trim(),
+        affiliateLink: url.trim(), // Changed from 'url' to 'affiliateLink'
         category: category.trim() || 'Uncategorized',
         badge: badge.trim()
       });
