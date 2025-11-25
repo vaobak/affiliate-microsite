@@ -85,7 +85,7 @@ export default function ProductCard({ product, collectionId, theme = 'blue', sho
         {/* Glassmorphism overlay */}
         <div className="absolute inset-0 bg-white/10 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
         
-        <div className="flex items-center gap-4 p-4 relative z-10">
+        <div className="flex items-center gap-3 p-3 relative z-10">
           {/* Image Thumbnail */}
           {hasImage && (
             <div className="w-16 h-16 rounded-xl overflow-hidden flex-shrink-0 bg-white/20 backdrop-blur-sm ring-2 ring-white/30 group-hover:ring-white/50 transition-all duration-300">
