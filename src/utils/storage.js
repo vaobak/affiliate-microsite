@@ -1,47 +1,72 @@
-// Storage utility - Now using Cloudflare D1 API with localStorage fallback
-// Analytics functions are re-exported from db.js
+// Storage utility - Pure Cloudflare D1 API (No localStorage except for UI state)
+import * as api from './api';
 
-export {
-  getPageViews,
-  trackPageView
-} from './db';
+// Page Views
+export async function getPageViews() {
+  try {
+    const count = await api.fetchPageViews();
+    return count;
+  } catch (error) {
+    console.error('Error fetching page views:', error);
+    return 0;
+  }
+}
 
-// Recent activity - keeping localStorage for now as it's UI-only
+export async function trackPageView() {
+  try {
+    await api.trackPageView();
+  } catch (error) {
+    console.error('Error tracking page view:', error);
+  }
+}
+
+// Legacy compatibility
+export const incrementPageViews = trackPageView;
+
+// Recent Activity (localStorage for UI only - not critical data)
 const ACTIVITY_KEY = 'recent_activity';
 
 export function getRecentActivity() {
-  const activity = localStorage.getItem(ACTIVITY_KEY);
-  return activity ? JSON.parse(activity) : [];
+  try {
+    const activity = localStorage.getItem(ACTIVITY_KEY);
+    return activity ? JSON.parse(activity) : [];
+  } catch {
+    return [];
+  }
 }
 
 export function addActivity(type, title, description) {
-  const activities = getRecentActivity();
-  const newActivity = {
-    id: Date.now(),
-    type,
-    title,
-    description,
-    timestamp: new Date().toISOString()
-  };
-  activities.unshift(newActivity);
-  const limited = activities.slice(0, 10);
-  localStorage.setItem(ACTIVITY_KEY, JSON.stringify(limited));
+  try {
+    const activities = getRecentActivity();
+    const newActivity = {
+      id: Date.now(),
+      type,
+      title,
+      description,
+      timestamp: new Date().toISOString()
+    };
+    activities.unshift(newActivity);
+    const limited = activities.slice(0, 10);
+    localStorage.setItem(ACTIVITY_KEY, JSON.stringify(limited));
+  } catch (error) {
+    console.error('Error adding activity:', error);
+  }
 }
 
-// Legacy functions for compatibility
+// Legacy functions (no-op for D1)
 export function getItems() {
   return [];
 }
 
-export function saveItems(items) {
-  // No-op, using D1 now
+export function saveItems() {
+  // No-op
 }
 
 export function addItem(item) {
   return item;
 }
 
-export function updateItem(id, updatedData) {
+export function updateItem(id, data) {
   return null;
 }
 
@@ -65,10 +90,11 @@ export function getTotalClicks() {
   return 0;
 }
 
-export function incrementPageViews() {
-  trackPageView();
+export function getItemsByCollection() {
+  return [];
 }
 
+// Cleanup functions
 export function cleanupCollectionActivity(collectionId) {
   const activities = getRecentActivity();
   const filtered = activities.filter(activity => {
@@ -87,8 +113,4 @@ export function resetAllData() {
 
 export function hasActiveCollections() {
   return true;
-}
-
-export function getItemsByCollection(collectionSlug) {
-  return [];
 }

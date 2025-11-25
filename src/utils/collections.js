@@ -1,111 +1,162 @@
-// Collections utility - Now using Cloudflare D1 API with localStorage fallback
-// All functions are re-exported from db.js which handles the abstraction
+// Collections utility - Pure Cloudflare D1 API (No localStorage)
+import * as api from './api';
 
-import {
-  getCollections,
-  saveCollections,
-  addCollection,
-  deleteCollection,
-  getCollectionProducts,
-  addProductToCollection,
-  updateProductInCollection,
-  deleteProductFromCollection,
-  getCollectionBySlug,
-  getDefaultCollection,
-  trackClick
-} from './db';
+// Get all collections with products
+export async function getCollections() {
+  try {
+    const collections = await api.fetchCollections();
+    return collections;
+  } catch (error) {
+    console.error('Error fetching collections:', error);
+    throw error;
+  }
+}
 
-// Re-export for compatibility
-export {
-  getCollections,
-  saveCollections,
-  addCollection,
-  deleteCollection,
-  getCollectionProducts,
-  addProductToCollection,
-  updateProductInCollection,
-  deleteProductFromCollection,
-  getCollectionBySlug,
-  getDefaultCollection
-};
+// Get single collection by ID
+export async function getCollectionById(id) {
+  const collections = await getCollections();
+  return collections.find(c => c.id === id);
+}
 
-// Additional helper functions
+// Get collection by slug
+export async function getCollectionBySlug(slug) {
+  const collections = await getCollections();
+  return collections.find(c => c.slug === slug);
+}
+
+// Get default collection
+export async function getDefaultCollection() {
+  const collections = await getCollections();
+  return collections.find(c => c.isDefault || c.is_default) || collections[0];
+}
+
+// Add new collection
+export async function addCollection(collection) {
+  try {
+    const result = await api.createCollection(collection);
+    return result;
+  } catch (error) {
+    console.error('Error adding collection:', error);
+    throw error;
+  }
+}
+
+// Update collection
+export async function updateCollection(id, updates) {
+  try {
+    // Note: API doesn't have update endpoint yet, so we'll handle it client-side
+    const collections = await getCollections();
+    const collection = collections.find(c => c.id === id);
+    if (collection) {
+      Object.assign(collection, updates);
+    }
+    return collection;
+  } catch (error) {
+    console.error('Error updating collection:', error);
+    throw error;
+  }
+}
+
+// Delete collection
+export async function deleteCollection(id) {
+  try {
+    await api.deleteCollection(id);
+    return true;
+  } catch (error) {
+    console.error('Error deleting collection:', error);
+    throw error;
+  }
+}
+
+// Get products from a collection
+export async function getCollectionProducts(collectionId) {
+  try {
+    const products = await api.fetchProducts(collectionId);
+    return products;
+  } catch (error) {
+    console.error('Error fetching products:', error);
+    throw error;
+  }
+}
+
+// Get single product from collection
 export async function getProductFromCollection(collectionId, productId) {
   const products = await getCollectionProducts(collectionId);
   return products.find(p => p.id === parseInt(productId));
 }
 
-export async function incrementClicksInCollection(collectionId, productId) {
-  const { trackClick } = await import('./db');
-  await trackClick(productId, collectionId);
-}
-
-export async function updateCollection(id, updates) {
-  // For now, collections don't have update endpoint
-  // This is a placeholder for compatibility
-  const collections = await getCollections();
-  const collection = collections.find(c => c.id === id);
-  if (collection) {
-    Object.assign(collection, updates);
-    await saveCollections(collections);
-  }
-  return collection;
-}
-
-export async function migrateOldProducts() {
-  // Migration from old localStorage structure
-  // Check if old data exists
-  const oldData = localStorage.getItem('affiliate_items');
-  if (!oldData) return false;
-  
+// Add product to collection
+export async function addProductToCollection(collectionId, product) {
   try {
-    const oldItems = JSON.parse(oldData);
-    if (oldItems.length === 0) return false;
-    
-    // Get default collection
-    const collections = await getCollections();
-    const defaultCollection = collections.find(c => c.isDefault) || collections[0];
-    
-    // Migrate each product
-    for (const item of oldItems) {
-      await addProductToCollection(defaultCollection.id, {
-        name: item.name,
-        description: item.description || '',
-        price: item.price || 0,
-        affiliateLink: item.affiliateLink || item.link || '',
-        imageUrl: item.imageUrl || item.image || '',
-        category: item.category || 'Uncategorized',
-        badge: item.badge || '',
-        clicks: item.clicks || 0
-      });
-    }
-    
-    // Backup old data
-    localStorage.setItem('affiliate_items_backup', oldData);
-    // Clear old data
-    localStorage.removeItem('affiliate_items');
-    
+    const result = await api.createProduct({
+      collectionId,
+      name: product.name,
+      description: product.description || '',
+      price: product.price || 0,
+      affiliateLink: product.affiliateLink || product.affiliate_link || '',
+      imageUrl: product.imageUrl || product.image_url || '',
+      category: product.category || 'Uncategorized',
+      badge: product.badge || ''
+    });
+    return result;
+  } catch (error) {
+    console.error('Error adding product:', error);
+    throw error;
+  }
+}
+
+// Update product in collection
+export async function updateProductInCollection(collectionId, productId, updates) {
+  try {
+    await api.updateProduct(productId, {
+      name: updates.name,
+      description: updates.description || '',
+      price: updates.price || 0,
+      affiliateLink: updates.affiliateLink || updates.affiliate_link || '',
+      imageUrl: updates.imageUrl || updates.image_url || '',
+      category: updates.category || 'Uncategorized',
+      badge: updates.badge || ''
+    });
+    return { id: productId, ...updates };
+  } catch (error) {
+    console.error('Error updating product:', error);
+    throw error;
+  }
+}
+
+// Delete product from collection
+export async function deleteProductFromCollection(collectionId, productId) {
+  try {
+    await api.deleteProduct(productId);
     return true;
   } catch (error) {
-    console.error('Migration error:', error);
-    return false;
+    console.error('Error deleting product:', error);
+    throw error;
   }
 }
 
-// Import/Export functions for Excel
-import * as XLSX from 'xlsx';
+// Increment clicks for product (track click)
+export async function incrementClicksInCollection(collectionId, productId) {
+  try {
+    await api.trackClick(productId, collectionId);
+  } catch (error) {
+    console.error('Error tracking click:', error);
+  }
+}
 
+// Import/Export functions
 export function importProductsReplaceToCollection(collectionId, products) {
-  // This will be handled by the component using db.js functions
   return products;
 }
 
 export function importProductsNewToCollection(collectionId, products) {
-  // This will be handled by the component using db.js functions
   return products;
 }
 
-export function exportCollectionProducts(collectionId, products) {
+// Export products to Excel
+export async function exportCollectionProducts(collectionId, products) {
+  const XLSX = await import('xlsx');
+  
   const worksheet = XLSX.utils.json_to_sheet(products.map(p => ({
     ID: p.id,
     Name: p.name,
@@ -124,3 +175,14 @@ export function exportCollectionProducts(collectionId, products) {
   const fileName = `products-${collectionId}-${new Date().toISOString().split('T')[0]}.xlsx`;
   XLSX.writeFile(workbook, fileName);
 }
+
+// Migration helper (no-op for D1)
+export async function migrateOldProducts() {
+  console.log('Migration not needed for D1 version');
+  return false;
+}
+
+// Compatibility exports
+export const saveCollections = async () => {
+  console.warn('saveCollections is deprecated in D1 version');
+};

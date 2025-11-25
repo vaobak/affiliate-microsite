@@ -19,15 +19,19 @@ export default function ProductCard({ product, collectionId }) {
     
     // Increment clicks in collection
     if (collectionId) {
-      incrementClicksInCollection(collectionId, product.id);
+      await incrementClicksInCollection(collectionId, product.id);
       
       // Track click for analytics
-      trackClick(product.id, collectionId);
+      await trackClick(product.id, collectionId);
       
       // Check for milestone achievements
-      const updatedProduct = getProductFromCollection(collectionId, product.id);
-      if (updatedProduct) {
-        checkMilestones(product.name, oldClicks, updatedProduct.clicks);
+      try {
+        const updatedProduct = await getProductFromCollection(collectionId, product.id);
+        if (updatedProduct) {
+          checkMilestones(product.name, oldClicks, updatedProduct.clicks);
+        }
+      } catch (error) {
+        console.error('Error checking milestones:', error);
       }
     }
     
