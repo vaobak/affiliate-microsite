@@ -173,14 +173,19 @@ export default function Collections() {
           </div>
 
           <div className={viewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6' : 'space-y-4'}>
-            {collections.map((collection) => (
-              <div key={collection.id} className={`bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 hover:shadow-lg transition-shadow ${viewMode === 'grid' ? 'p-6' : 'p-4'}`}>
+            {collections.map((collection) => {
+              const theme = getTheme(collection.theme || 'blue');
+              return (
+              <div key={collection.id} className={`bg-white dark:bg-gray-800 rounded-xl border-2 ${theme.border} hover:shadow-lg transition-all ${viewMode === 'grid' ? 'p-6' : 'p-4'}`}>
+                {/* Theme gradient header */}
+                <div className={`h-2 -mx-6 -mt-6 mb-4 rounded-t-xl bg-gradient-to-r ${theme.gradient}`}></div>
+                
                 <div className={`flex items-start justify-between ${viewMode === 'grid' ? 'mb-4' : 'mb-0'}`}>
                   <div className="flex-1">
-                    <h3 className={`font-bold text-gray-800 dark:text-gray-200 ${viewMode === 'grid' ? 'text-lg mb-1' : 'text-base'}`}>
+                    <h3 className={`font-bold ${theme.text} ${viewMode === 'grid' ? 'text-lg mb-1' : 'text-base'}`}>
                       {collection.name}
                       {(collection.isDefault || collection.id === 'home') && (
-                        <span className="ml-2 text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 px-2 py-0.5 rounded-full">
+                        <span className={`ml-2 text-xs ${theme.badge} px-2 py-0.5 rounded-full`}>
                           Default
                         </span>
                       )}
@@ -237,7 +242,8 @@ export default function Collections() {
                   </div>
                 </div>
               </div>
-            ))}
+            );
+            })}
           </div>
         </div>
       </main>
