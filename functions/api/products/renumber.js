@@ -26,20 +26,32 @@ export async function onRequestPost({ request, env }) {
       });
     }
     
-    // Create temporary table to store renumbered products
-    await env.DB.prepare(`
-      CREATE TEMP TABLE IF NOT EXISTS temp_products AS 
-      SELECT * FROM products WHERE 1=0
-    `).run();
+    // Get min ID from this collection to start renumbering from there
+    const minId = products[0].id;
+    
+    // Store products data temporarily
+    const productsData = products.map(p => ({
+      collection_id: p.collection_id,
+      name: p.name,
+      description: p.description,
+      price: p.price,
+      affiliate_link: p.affiliate_link,
+      image_url: p.image_url,
+      category: p.category,
+      badge: p.badge,
+      clicks: p.clicks || 0,
+      created_at: p.created_at,
+      updated_at: p.updated_at
+    }));
     
     // Delete all products from this collection
     await env.DB.prepare(
       'DELETE FROM products WHERE collection_id = ?'
     ).bind(collectionId).run();
     
-    // Re-insert products with new sequential IDs
-    let newId = 1;
-    for (const product of products) {
+    // Re-insert products with new sequential IDs starting from minId
+    let newId = minId;
+    for (const product of productsData) {
       await env.DB.prepare(`
         INSERT INTO products (id, collection_id, name, description, price, affiliate_link, image_url, category, badge, clicks, created_at, updated_at)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -53,7 +65,7 @@ export async function onRequestPost({ request, env }) {
         product.image_url,
         product.category,
         product.badge,
-        product.clicks || 0,
+        product.clicks,
         product.created_at,
         product.updated_at
       ).run();
@@ -61,9 +73,14 @@ export async function onRequestPost({ request, env }) {
     }
     
     // Update SQLite sequence to continue from the last ID
+    const { results: maxResults } = await env.DB.prepare(
+      'SELECT MAX(id) as maxId FROM products'
+    ).all();
+    const maxId = maxResults[0]?.maxId || newId - 1;
+    
     await env.DB.prepare(`
-      UPDATE sqlite_sequence SET seq = ? WHERE name = 'products'
-    `).bind(newId - 1).run();
+      INSERT OR REPLACE INTO sqlite_sequence (name, seq) VALUES ('products', ?)
+    `).bind(maxId).run();
     
     return new Response(JSON.stringify({ 
       success: true,
