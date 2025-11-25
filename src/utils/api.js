@@ -128,3 +128,75 @@ export async function trackPageView() {
   if (!response.ok) throw new Error('Failed to track page view');
   return response.json();
 }
+
+// Reset product ID sequence for a collection
+export async function resetProductIdSequence(collectionId) {
+  try {
+    const response = await fetch(`${API_BASE}/products/reset-sequence`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ collectionId })
+    });
+    if (!response.ok) {
+      console.warn('Failed to reset ID sequence, continuing anyway');
+    }
+    return response.ok;
+  } catch (error) {
+    console.warn('Error resetting ID sequence:', error);
+    return false;
+  }
+}
+
+// User Preferences API
+export async function fetchPreference(key) {
+  try {
+    const response = await fetch(`${API_BASE}/preferences?key=${key}`);
+    if (!response.ok) throw new Error('Failed to fetch preference');
+    const data = await response.json();
+    return data.value;
+  } catch (error) {
+    console.error('Error fetching preference:', error);
+    return null;
+  }
+}
+
+export async function fetchAllPreferences() {
+  try {
+    const response = await fetch(`${API_BASE}/preferences`);
+    if (!response.ok) throw new Error('Failed to fetch preferences');
+    return response.json();
+  } catch (error) {
+    console.error('Error fetching preferences:', error);
+    return {};
+  }
+}
+
+export async function savePreference(key, value) {
+  try {
+    const response = await fetch(`${API_BASE}/preferences`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ key, value })
+    });
+    if (!response.ok) throw new Error('Failed to save preference');
+    return response.json();
+  } catch (error) {
+    console.error('Error saving preference:', error);
+    throw error;
+  }
+}
+
+export async function deletePreference(key) {
+  try {
+    const response = await fetch(`${API_BASE}/preferences`, {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ key })
+    });
+    if (!response.ok) throw new Error('Failed to delete preference');
+    return response.json();
+  } catch (error) {
+    console.error('Error deleting preference:', error);
+    throw error;
+  }
+}

@@ -152,6 +152,9 @@ export async function importProductsReplaceToCollection(collectionId, products) 
       await api.deleteProduct(product.id);
     }
     
+    // Reset ID sequence if collection is now empty
+    await api.resetProductIdSequence(collectionId);
+    
     // Add all new products
     let imported = 0;
     let errors = [];
@@ -204,6 +207,12 @@ export async function importProductsReplaceToCollection(collectionId, products) 
 
 export async function importProductsNewToCollection(collectionId, products) {
   try {
+    // Check if collection is empty, if so reset ID sequence
+    const existingProducts = await api.fetchProducts(collectionId);
+    if (existingProducts.length === 0) {
+      await api.resetProductIdSequence(collectionId);
+    }
+    
     // Add new products without deleting existing ones
     let imported = 0;
     let errors = [];

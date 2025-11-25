@@ -14,7 +14,7 @@ const BADGE_STYLES = {
   'LIMITED': 'bg-gradient-to-r from-gray-700 to-gray-900 text-white'
 };
 
-export default function ProductCard({ product, collectionId, theme = 'blue' }) {
+export default function ProductCard({ product, collectionId, theme = 'blue', showCategory = true }) {
   const handleClick = async () => {
     const oldClicks = product.clicks || 0;
     
@@ -107,7 +107,7 @@ export default function ProductCard({ product, collectionId, theme = 'blue' }) {
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1">
               <span className="text-xs font-mono opacity-75 tracking-wide">#{product.id}</span>
-              {product.category && (
+              {showCategory && product.category && (
                 <span className="text-xs px-2 py-0.5 bg-white/20 rounded-full backdrop-blur-sm">
                   {product.category}
                 </span>

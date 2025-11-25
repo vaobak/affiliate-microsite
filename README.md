@@ -251,5 +251,27 @@ Jika ada pertanyaan atau issue, silakan buat issue di repository ini.
 
 Made with ❤️ using React + Vite + Tailwind CSS + Cloudflare D1
 
-**Version:** 2.0 (Linktree-Style Complete)  
+**Version:** 2.2 (Preferences Sync)  
 **Last Updated:** November 25, 2025
+
+## 🔄 **Latest Updates (v2.2)**
+
+### **New: Cross-Device Sync** 🌐
+- ✅ **User Preferences in D1** - Settings sync across all devices
+- ✅ **No localStorage for Data** - All important data in database
+- ✅ **Persistent Settings** - Survive browser data clear
+- ✅ **Centralized Management** - Easy to add more preferences
+
+### **Bug Fixes (v2.1):**
+1. ✅ **ID Reset Bug** - ID sekarang mulai dari 1 saat collection kosong
+2. ✅ **Import Sequence** - ID sequence management yang proper
+
+### **Improvements:**
+1. ✅ **Category Toggle** - Show/hide kategori produk (synced!)
+2. ✅ **Clean UI Option** - Tampilan minimal
+3. ✅ **Cross-Device Sync** - Setting sama di semua device
+
+**Documentation:**
+- `PREFERENCES_SYNC_MIGRATION.md` - Cross-device sync migration guide
+- `BUG_FIXES_IMPROVEMENTS.md` - Bug fixes & improvements
+- `CATEGORY_TOGGLE_GUIDE.md` - Category toggle feature guide
