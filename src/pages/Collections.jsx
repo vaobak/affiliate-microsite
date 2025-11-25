@@ -19,30 +19,45 @@ export default function Collections() {
     loadCollections();
   }, []);
 
-  const loadCollections = () => {
-    const cols = getCollections();
-    setCollections(cols);
+  const loadCollections = async () => {
+    try {
+      const cols = await getCollections();
+      setCollections(Array.isArray(cols) ? cols : []);
+    } catch (error) {
+      console.error('Error loading collections:', error);
+      setCollections([]);
+    }
   };
 
-  const handleAddCollection = () => {
+  const handleAddCollection = async () => {
     if (!newCollection.name.trim()) return;
     
-    const slug = newCollection.slug.trim() || newCollection.name.toLowerCase().replace(/\s+/g, '');
-    addCollection({
-      name: newCollection.name.trim(),
-      slug: slug,
-      description: newCollection.description.trim()
-    });
-    
-    setNewCollection({ name: '', slug: '', description: '' });
-    setShowAddModal(false);
-    loadCollections();
+    try {
+      const slug = newCollection.slug.trim() || newCollection.name.toLowerCase().replace(/\s+/g, '');
+      await addCollection({
+        name: newCollection.name.trim(),
+        slug: slug,
+        description: newCollection.description.trim()
+      });
+      
+      setNewCollection({ name: '', slug: '', description: '' });
+      setShowAddModal(false);
+      await loadCollections();
+    } catch (error) {
+      console.error('Error adding collection:', error);
+      alert('Error adding collection. Please try again.');
+    }
   };
 
-  const handleDelete = (id) => {
-    deleteCollection(id);
-    loadCollections();
-    setDeleteConfirm(null);
+  const handleDelete = async (id) => {
+    try {
+      await deleteCollection(id);
+      await loadCollections();
+      setDeleteConfirm(null);
+    } catch (error) {
+      console.error('Error deleting collection:', error);
+      alert('Error deleting collection. Please try again.');
+    }
   };
 
   const handleEdit = (collection) => {
@@ -55,18 +70,23 @@ export default function Collections() {
     setShowEditModal(true);
   };
 
-  const handleUpdateCollection = () => {
+  const handleUpdateCollection = async () => {
     if (!editingCollection.name.trim()) return;
     
-    updateCollection(editingCollection.id, {
-      name: editingCollection.name.trim(),
-      slug: editingCollection.slug.trim() || editingCollection.name.toLowerCase().replace(/\s+/g, ''),
-      description: editingCollection.description.trim()
-    });
-    
-    setEditingCollection(null);
-    setShowEditModal(false);
-    loadCollections();
+    try {
+      await updateCollection(editingCollection.id, {
+        name: editingCollection.name.trim(),
+        slug: editingCollection.slug.trim() || editingCollection.name.toLowerCase().replace(/\s+/g, ''),
+        description: editingCollection.description.trim()
+      });
+      
+      setEditingCollection(null);
+      setShowEditModal(false);
+      await loadCollections();
+    } catch (error) {
+      console.error('Error updating collection:', error);
+      alert('Error updating collection. Please try again.');
+    }
   };
 
   const getTotalProducts = (collection) => {
