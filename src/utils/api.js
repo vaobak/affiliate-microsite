@@ -174,6 +174,33 @@ export async function renumberProductIds(collectionId) {
   }
 }
 
+// Resequence products in collection (using sequence_number field)
+export async function resequenceProducts(collectionId) {
+  try {
+    console.log('[Resequence] Starting resequence for collection:', collectionId);
+    const response = await fetch(`${API_BASE}/products/resequence`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ collectionId })
+    });
+    
+    console.log('[Resequence] Response status:', response.status);
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('[Resequence] Failed:', response.status, errorText);
+      return { success: false, error: errorText };
+    }
+    
+    const data = await response.json();
+    console.log('[Resequence] Success:', data);
+    return data;
+  } catch (error) {
+    console.error('[Resequence] Error:', error);
+    return { success: false, error: error.message };
+  }
+}
+
 // User Preferences API
 export async function fetchPreference(key) {
   try {

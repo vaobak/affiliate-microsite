@@ -98,10 +98,8 @@ export async function addProductToCollection(collectionId, product) {
       badge: product.badge || ''
     });
     
-    console.log('Product added, starting renumber...');
-    // Auto-renumber products to keep sequential IDs
-    const renumberResult = await api.renumberProductIds(collectionId);
-    console.log('Renumber result after add:', renumberResult);
+    // No need to resequence after add - sequence_number is auto-assigned
+    console.log('Product added with sequence number:', result.sequence_number);
     
     return result;
   } catch (error) {
@@ -135,10 +133,10 @@ export async function deleteProductFromCollection(collectionId, productId) {
     console.log('Deleting product:', productId, 'from collection:', collectionId);
     await api.deleteProduct(productId);
     
-    console.log('Product deleted, starting renumber...');
-    // Auto-renumber products to keep sequential IDs
-    const renumberResult = await api.renumberProductIds(collectionId);
-    console.log('Renumber result:', renumberResult);
+    console.log('Product deleted, starting resequence...');
+    // Auto-resequence products to keep sequential numbers (1, 2, 3, ...)
+    const resequenceResult = await api.resequenceProducts(collectionId);
+    console.log('Resequence result:', resequenceResult);
     
     return true;
   } catch (error) {
@@ -200,8 +198,8 @@ export async function importProductsReplaceToCollection(collectionId, products) 
       }
     }
     
-    // Renumber products to ensure sequential IDs (1, 2, 3, ...)
-    await api.renumberProductIds(collectionId);
+    // Resequence products to ensure sequential numbers (1, 2, 3, ...)
+    await api.resequenceProducts(collectionId);
     
     // Get updated products count
     const updatedProducts = await api.fetchProducts(collectionId);
@@ -261,8 +259,8 @@ export async function importProductsNewToCollection(collectionId, products) {
       }
     }
     
-    // Renumber products to ensure sequential IDs (1, 2, 3, ...)
-    await api.renumberProductIds(collectionId);
+    // Resequence products to ensure sequential numbers (1, 2, 3, ...)
+    await api.resequenceProducts(collectionId);
     
     // Get updated products count
     const updatedProducts = await api.fetchProducts(collectionId);

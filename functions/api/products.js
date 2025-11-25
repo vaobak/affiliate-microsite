@@ -13,7 +13,8 @@ export async function onRequestGet({ env, request }) {
       params.push(collectionId);
     }
     
-    query += ' ORDER BY id ASC';
+    // Order by sequence_number for proper per-collection numbering
+    query += ' ORDER BY sequence_number ASC, id ASC';
     
     const { results } = await env.DB.prepare(query).bind(...params).all();
     
@@ -32,9 +33,16 @@ export async function onRequestPost({ request, env }) {
   try {
     const product = await request.json();
     
+    // Get next sequence number for this collection
+    const { results: seqResults } = await env.DB.prepare(
+      'SELECT MAX(sequence_number) as max_seq FROM products WHERE collection_id = ?'
+    ).bind(product.collectionId).all();
+    
+    const nextSequence = (seqResults[0]?.max_seq || 0) + 1;
+    
     const result = await env.DB.prepare(
-      `INSERT INTO products (collection_id, name, description, price, affiliate_link, image_url, category, badge)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
+      `INSERT INTO products (collection_id, name, description, price, affiliate_link, image_url, category, badge, sequence_number)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
     ).bind(
       product.collectionId,
       product.name,
@@ -43,10 +51,11 @@ export async function onRequestPost({ request, env }) {
       product.affiliateLink,
       product.imageUrl || '',
       product.category || 'Uncategorized',
-      product.badge || ''
+      product.badge || '',
+      nextSequence
     ).run();
     
-    return new Response(JSON.stringify({ id: result.meta.last_row_id, ...product }), {
+    return new Response(JSON.stringify({ id: result.meta.last_row_id, sequence_number: nextSequence, ...product }), {
       headers: { 'Content-Type': 'application/json' }
     });
   } catch (error) {

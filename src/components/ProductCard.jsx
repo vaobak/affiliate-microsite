@@ -101,7 +101,7 @@ export default function ProductCard({ product, displayNumber, collectionId, them
           {/* Product Info */}
           <div className="flex-1 min-w-0">
             <span className="block truncate leading-snug">
-              <span className="text-xl font-bold mr-2">#{displayNumber || product.id}</span>
+              <span className="text-xl font-bold mr-2">#{product.sequence_number || displayNumber || product.id}</span>
               <span className="text-lg font-semibold">{product.name}</span>
             </span>
           </div>
