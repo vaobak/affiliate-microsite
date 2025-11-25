@@ -151,7 +151,7 @@ export default function Home() {
             {/* Products List */}
             <div className="space-y-3">
               {currentProducts.map((product) => (
-                <ProductCard key={product.id} product={product} collectionId={collection?.id} />
+                <ProductCard key={product.id} product={product} collectionId={collection?.id} theme={collection?.theme || 'blue'} />
               ))}
             </div>
 

@@ -2,6 +2,7 @@ import { addActivity } from '../utils/storage';
 import { incrementClicksInCollection, getProductFromCollection } from '../utils/collections';
 import { trackClick } from '../utils/analytics';
 import { checkMilestones } from '../utils/notifications';
+import { getTheme } from '../utils/themes';
 
 const BADGE_STYLES = {
   'PROMO': 'bg-gradient-to-r from-red-500 to-orange-500 text-white',
@@ -13,7 +14,7 @@ const BADGE_STYLES = {
   'LIMITED': 'bg-gradient-to-r from-gray-700 to-gray-900 text-white'
 };
 
-export default function ProductCard({ product, collectionId }) {
+export default function ProductCard({ product, collectionId, theme = 'blue' }) {
   const handleClick = async () => {
     const oldClicks = product.clicks || 0;
     
@@ -56,6 +57,8 @@ export default function ProductCard({ product, collectionId }) {
     window.open(product.url, '_blank', 'noopener,noreferrer');
   };
 
+  const themeColors = getTheme(theme);
+
   return (
     <div className="relative">
       {product.badge && (
@@ -65,7 +68,7 @@ export default function ProductCard({ product, collectionId }) {
       )}
       <button
         onClick={handleClick}
-        className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl text-left"
+        className={`w-full bg-gradient-to-r ${themeColors.gradient} hover:opacity-90 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl text-left`}
       >
         <div className="flex items-center gap-3">
           <span className="text-lg font-bold">#{product.id}</span>
