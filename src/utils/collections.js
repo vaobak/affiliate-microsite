@@ -127,6 +127,10 @@ export async function updateProductInCollection(collectionId, productId, updates
 export async function deleteProductFromCollection(collectionId, productId) {
   try {
     await api.deleteProduct(productId);
+    
+    // Auto-renumber products to keep sequential IDs
+    await api.renumberProductIds(collectionId);
+    
     return true;
   } catch (error) {
     console.error('Error deleting product:', error);
@@ -187,6 +191,9 @@ export async function importProductsReplaceToCollection(collectionId, products) 
       }
     }
     
+    // Renumber products to ensure sequential IDs (1, 2, 3, ...)
+    await api.renumberProductIds(collectionId);
+    
     // Get updated products count
     const updatedProducts = await api.fetchProducts(collectionId);
     
@@ -244,6 +251,9 @@ export async function importProductsNewToCollection(collectionId, products) {
         errors.push(`Error importing product "${product['Product Name'] || product.Name || product.name}": ${err.message}`);
       }
     }
+    
+    // Renumber products to ensure sequential IDs (1, 2, 3, ...)
+    await api.renumberProductIds(collectionId);
     
     // Get updated products count
     const updatedProducts = await api.fetchProducts(collectionId);

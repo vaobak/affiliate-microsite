@@ -251,16 +251,21 @@ Jika ada pertanyaan atau issue, silakan buat issue di repository ini.
 
 Made with ❤️ using React + Vite + Tailwind CSS + Cloudflare D1
 
-**Version:** 2.3 (Simple Layout)  
+**Version:** 2.3.2 (Auto-Renumber)  
 **Last Updated:** November 25, 2025
 
-## 🎨 **Latest Updates (v2.3)**
+## 🔢 **Latest Updates (v2.3.2)**
 
-### **New: Simplified Layout** ✨
+### **New: Auto-Renumber IDs** 🎯
+- ✅ **Sequential IDs** - Selalu berurutan 1, 2, 3, ...
+- ✅ **No Gaps** - Tidak ada hole setelah delete
+- ✅ **Auto After Delete** - Renumber otomatis setelah hapus produk
+- ✅ **Auto After Import** - Renumber otomatis setelah import
+
+### **Previous (v2.3): Simplified Layout** ✨
 - ✅ **Clean Product Cards** - Hanya #ID dan Nama Produk
-- ✅ **No Category Display** - Tampilan lebih simple
-- ✅ **No Toggle Button** - Fokus pada konten
-- ✅ **Easier to Scan** - List produk lebih mudah dibaca
+- ✅ **Bold Numbers** - Nomor urut lebih besar dan bold
+- ✅ **Better Spacing** - Gap yang jelas antara nomor dan nama
 
 ### **Previous (v2.2): Cross-Device Sync** 🌐
 - ✅ **User Preferences in D1** - Settings sync across all devices
@@ -276,6 +281,8 @@ Made with ❤️ using React + Vite + Tailwind CSS + Cloudflare D1
 3. ✅ **Cross-Device Sync** - Setting sama di semua device
 
 **Documentation:**
+- `AUTO_RENUMBER_FIX.md` - Auto-renumber sequential IDs (v2.3.2)
+- `TYPOGRAPHY_AND_ID_FIX.md` - Typography & ID fixes (v2.3.1)
 - `SIMPLE_LAYOUT_UPDATE.md` - Simple layout changes (v2.3)
-- `PREFERENCES_SYNC_MIGRATION.md` - Cross-device sync migration guide
+- `PREFERENCES_SYNC_MIGRATION.md` - Cross-device sync migration
 - `BUG_FIXES_IMPROVEMENTS.md` - Bug fixes & improvements

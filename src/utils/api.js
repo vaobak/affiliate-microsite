@@ -147,6 +147,26 @@ export async function resetProductIdSequence(collectionId) {
   }
 }
 
+// Renumber product IDs to be sequential (1, 2, 3, ...)
+export async function renumberProductIds(collectionId) {
+  try {
+    const response = await fetch(`${API_BASE}/products/renumber`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ collectionId })
+    });
+    if (!response.ok) {
+      console.warn('Failed to renumber products');
+      return false;
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.warn('Error renumbering products:', error);
+    return false;
+  }
+}
+
 // User Preferences API
 export async function fetchPreference(key) {
   try {
