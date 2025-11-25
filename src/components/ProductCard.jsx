@@ -74,17 +74,6 @@ export default function ProductCard({ product, collectionId, theme = 'blue', sho
           {product.badge}
         </div>
       )}
-      
-      {/* Social Proof - Clicks Counter */}
-      {clicks > 0 && (
-        <div className="absolute -top-2 -left-2 z-10 px-2 py-1 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-full text-xs font-semibold text-gray-700 dark:text-gray-300 shadow-md flex items-center gap-1 animate-scale-in">
-          <svg className="w-3 h-3 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-            <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
-            <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd"/>
-          </svg>
-          {clicks}
-        </div>
-      )}
 
       <button
         onClick={handleClick}
