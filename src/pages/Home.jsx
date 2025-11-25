@@ -163,7 +163,8 @@ export default function Home() {
                   style={{ animationDelay: `${index * 0.05}s` }}
                 >
                   <ProductCard 
-                    product={product} 
+                    product={product}
+                    displayNumber={startIndex + index + 1}
                     collectionId={collection?.id} 
                     theme={collection?.theme || 'blue'}
                     showCategory={false}
