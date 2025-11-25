@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { addProductToCollection, getCollections } from '../utils/collections';
 import CategorySelect from '../components/CategorySelect';
@@ -10,10 +10,25 @@ export default function AddCollectionProduct() {
   const [category, setCategory] = useState('');
   const [badge, setBadge] = useState('');
   const [error, setError] = useState('');
+  const [collection, setCollection] = useState(null);
   const navigate = useNavigate();
 
-  const collections = getCollections();
-  const collection = collections.find(c => c.id === collectionId);
+  useEffect(() => {
+    const loadCollection = async () => {
+      try {
+        const collections = await getCollections();
+        const col = collections.find(c => c.id === collectionId);
+        setCollection(col);
+        if (!col) {
+          navigate('/collections');
+        }
+      } catch (error) {
+        console.error('Error loading collection:', error);
+        navigate('/collections');
+      }
+    };
+    loadCollection();
+  }, [collectionId, navigate]);
 
   const handleSubmit = (e) => {
     e.preventDefault();

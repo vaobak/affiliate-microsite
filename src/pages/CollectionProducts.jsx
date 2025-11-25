@@ -58,22 +58,32 @@ export default function CollectionProducts() {
     }
   }, [location]);
 
-  const loadData = () => {
-    const collections = getCollections();
-    const currentCollection = collections.find(c => c.id === collectionId);
-    if (!currentCollection) {
-      navigate('/collections');
-      return;
+  const loadData = async () => {
+    try {
+      const collections = await getCollections();
+      const currentCollection = collections.find(c => c.id === collectionId);
+      if (!currentCollection) {
+        navigate('/collections');
+        return;
+      }
+      setCollection(currentCollection);
+      const prods = await getCollectionProducts(collectionId);
+      setProducts(Array.isArray(prods) ? prods.sort((a, b) => b.id - a.id) : []);
+    } catch (error) {
+      console.error('Error loading collection products:', error);
+      setProducts([]);
     }
-    setCollection(currentCollection);
-    const prods = getCollectionProducts(collectionId);
-    setProducts(prods.sort((a, b) => b.id - a.id));
   };
 
-  const handleDelete = (productId) => {
-    deleteProductFromCollection(collectionId, productId);
-    loadData();
-    setDeleteConfirm(null);
+  const handleDelete = async (productId) => {
+    try {
+      await deleteProductFromCollection(collectionId, productId);
+      await loadData();
+      setDeleteConfirm(null);
+    } catch (error) {
+      console.error('Error deleting product:', error);
+      alert('Error deleting product. Please try again.');
+    }
   };
 
   const applyFilters = (productsToFilter) => {
@@ -385,15 +395,15 @@ export default function CollectionProducts() {
     });
   };
 
-  const handleBulkDelete = () => {
+  const handleBulkDelete = async () => {
     if (selectedProducts.length === 0) return;
     
     if (confirm(`Delete ${selectedProducts.length} selected products?`)) {
       try {
-        bulkDeleteProducts(collectionId, selectedProducts);
+        await bulkDeleteProducts(collectionId, selectedProducts);
         setImportStatus({ type: 'success', message: `${selectedProducts.length} products deleted successfully` });
         setSelectedProducts([]);
-        loadData();
+        await loadData();
         setTimeout(() => setImportStatus(null), 3000);
       } catch (error) {
         setImportStatus({ type: 'error', message: error.message });
@@ -407,7 +417,7 @@ export default function CollectionProducts() {
     setShowBulkEditModal(true);
   };
 
-  const handleBulkEditSubmit = () => {
+  const handleBulkEditSubmit = async () => {
     try {
       const updates = {};
       if (bulkEditData.category) updates.category = bulkEditData.category;
@@ -419,12 +429,12 @@ export default function CollectionProducts() {
         return;
       }
 
-      bulkUpdateProducts(collectionId, selectedProducts, updates);
+      await bulkUpdateProducts(collectionId, selectedProducts, updates);
       setImportStatus({ type: 'success', message: `${selectedProducts.length} products updated successfully` });
       setSelectedProducts([]);
       setBulkEditData({ category: '', badge: '' });
       setShowBulkEditModal(false);
-      loadData();
+      await loadData();
       setTimeout(() => setImportStatus(null), 3000);
     } catch (error) {
       setImportStatus({ type: 'error', message: error.message });
@@ -437,7 +447,7 @@ export default function CollectionProducts() {
     setShowBulkMoveModal(true);
   };
 
-  const handleBulkMoveSubmit = () => {
+  const handleBulkMoveSubmit = async () => {
     if (!targetCollectionId) {
       setImportStatus({ type: 'error', message: 'Please select a target collection' });
       setTimeout(() => setImportStatus(null), 3000);
@@ -445,12 +455,12 @@ export default function CollectionProducts() {
     }
 
     try {
-      bulkMoveProducts(collectionId, targetCollectionId, selectedProducts);
+      await bulkMoveProducts(collectionId, targetCollectionId, selectedProducts);
       setImportStatus({ type: 'success', message: `${selectedProducts.length} products moved successfully` });
       setSelectedProducts([]);
       setTargetCollectionId('');
       setShowBulkMoveModal(false);
-      loadData();
+      await loadData();
       setTimeout(() => setImportStatus(null), 3000);
     } catch (error) {
       setImportStatus({ type: 'error', message: error.message });
@@ -458,7 +468,7 @@ export default function CollectionProducts() {
     }
   };
 
-  const handleBulkDuplicate = () => {
+  const handleBulkDuplicate = async () => {
     if (!targetCollectionId) {
       setImportStatus({ type: 'error', message: 'Please select a target collection' });
       setTimeout(() => setImportStatus(null), 3000);
@@ -466,7 +476,7 @@ export default function CollectionProducts() {
     }
 
     try {
-      bulkDuplicateProducts(collectionId, targetCollectionId, selectedProducts);
+      await bulkDuplicateProducts(collectionId, targetCollectionId, selectedProducts);
       setImportStatus({ type: 'success', message: `${selectedProducts.length} products duplicated successfully` });
       setSelectedProducts([]);
       setTargetCollectionId('');

@@ -23,37 +23,44 @@ export default function Analytics() {
     loadAnalyticsData();
   }, [timeRange]);
 
-  const loadAnalyticsData = () => {
-    const cols = getCollections();
-    setCollections(cols);
+  const loadAnalyticsData = async () => {
+    try {
+      const cols = await getCollections();
+      setCollections(Array.isArray(cols) ? cols : []);
 
-    // Aggregate all products from all collections
-    let allProducts = [];
-    cols.forEach(col => {
-      const products = getCollectionProducts(col.id);
-      allProducts = [...allProducts, ...products.map(p => ({ ...p, collectionName: col.name }))];
-    });
+      // Aggregate all products from all collections
+      let allProducts = [];
+      for (const col of cols) {
+        const products = await getCollectionProducts(col.id);
+        const productsArray = Array.isArray(products) ? products : [];
+        allProducts = [...allProducts, ...productsArray.map(p => ({ ...p, collectionName: col.name }))];
+      }
 
-    // Calculate stats
-    const totalClicks = allProducts.reduce((sum, p) => sum + (p.clicks || 0), 0);
-    const totalProducts = allProducts.length;
-    const avgCTR = totalProducts > 0 ? ((totalClicks / totalProducts) * 100).toFixed(2) : 0;
-    const estimatedRevenue = (totalClicks * 0.5).toFixed(2); // Assume $0.5 per click
+      // Calculate stats
+      const totalClicks = allProducts.reduce((sum, p) => sum + (p.clicks || 0), 0);
+      const totalProducts = allProducts.length;
+      const avgCTR = totalProducts > 0 ? ((totalClicks / totalProducts) * 100).toFixed(2) : 0;
+      const estimatedRevenue = (totalClicks * 0.5).toFixed(2); // Assume $0.5 per click
 
-    setStats({
-      totalClicks,
-      totalProducts,
-      avgCTR,
-      estimatedRevenue
-    });
+      setStats({
+        totalClicks,
+        totalProducts,
+        avgCTR,
+        estimatedRevenue
+      });
 
-    // Top 10 products by clicks
-    const sorted = [...allProducts].sort((a, b) => (b.clicks || 0) - (a.clicks || 0));
-    setTopProducts(sorted.slice(0, 10));
+      // Top 10 products by clicks
+      const sorted = [...allProducts].sort((a, b) => (b.clicks || 0) - (a.clicks || 0));
+      setTopProducts(sorted.slice(0, 10));
 
-    // Generate clicks data for chart (mock data for now)
-    const history = getClickHistory(timeRange);
-    setClicksData(history);
+      // Generate clicks data for chart (mock data for now)
+      const history = await getClickHistory(timeRange);
+      setClicksData(history);
+    } catch (error) {
+      console.error('Error loading analytics data:', error);
+      setCollections([]);
+      setTopProducts([]);
+    }
   };
 
   const getChartData = () => {
@@ -256,7 +263,7 @@ export default function Analytics() {
               <h3 className="text-lg font-bold text-gray-800 dark:text-gray-200 mb-4">CTR by Collection</h3>
               <div className="space-y-4">
                 {collections.map(col => {
-                  const products = getCollectionProducts(col.id);
+                  const products = Array.isArray(col.products) ? col.products : [];
                   const totalClicks = products.reduce((sum, p) => sum + (p.clicks || 0), 0);
                   const ctr = products.length > 0 ? ((totalClicks / products.length) * 100).toFixed(1) : 0;
                   const percentage = stats.totalClicks > 0 ? (totalClicks / stats.totalClicks) * 100 : 0;

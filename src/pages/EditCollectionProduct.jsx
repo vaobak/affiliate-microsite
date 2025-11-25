@@ -11,22 +11,39 @@ export default function EditCollectionProduct() {
   const [badge, setBadge] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
+  const [collection, setCollection] = useState(null);
   const navigate = useNavigate();
 
-  const collections = getCollections();
-  const collection = collections.find(c => c.id === collectionId);
-
   useEffect(() => {
-    const product = getProductFromCollection(collectionId, productId);
-    if (product) {
-      setName(product.name);
-      setUrl(product.url);
-      setCategory(product.category || '');
-      setBadge(product.badge || '');
-    } else {
-      setError('Product not found');
-    }
-    setLoading(false);
+    const loadData = async () => {
+      try {
+        const collections = await getCollections();
+        const col = collections.find(c => c.id === collectionId);
+        setCollection(col);
+        
+        if (!col) {
+          setError('Collection not found');
+          setLoading(false);
+          return;
+        }
+
+        const product = await getProductFromCollection(collectionId, productId);
+        if (product) {
+          setName(product.name);
+          setUrl(product.url);
+          setCategory(product.category || '');
+          setBadge(product.badge || '');
+        } else {
+          setError('Product not found');
+        }
+        setLoading(false);
+      } catch (error) {
+        console.error('Error loading product:', error);
+        setError('Error loading product');
+        setLoading(false);
+      }
+    };
+    loadData();
   }, [collectionId, productId]);
 
   const handleSubmit = (e) => {

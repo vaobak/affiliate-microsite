@@ -6,8 +6,17 @@ export default function CollectionSelect({ value = [], onChange }) {
   const [selectedCollections, setSelectedCollections] = useState(value);
 
   useEffect(() => {
-    const cols = getCollections().filter(c => !c.isDefault); // Exclude "All" collection
-    setCollections(cols);
+    const loadCollections = async () => {
+      try {
+        const cols = await getCollections();
+        const filtered = Array.isArray(cols) ? cols.filter(c => !c.isDefault) : [];
+        setCollections(filtered);
+      } catch (error) {
+        console.error('Error loading collections:', error);
+        setCollections([]);
+      }
+    };
+    loadCollections();
   }, []);
 
   useEffect(() => {

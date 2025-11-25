@@ -11,8 +11,16 @@ export default function Sidebar({ productCount = 0 }) {
   const location = useLocation();
 
   useEffect(() => {
-    const cols = getCollections();
-    setCollections(cols);
+    const loadCollections = async () => {
+      try {
+        const cols = await getCollections();
+        setCollections(Array.isArray(cols) ? cols : []);
+      } catch (error) {
+        console.error('Error loading collections in sidebar:', error);
+        setCollections([]);
+      }
+    };
+    loadCollections();
   }, []);
 
   const handleLogout = () => {
