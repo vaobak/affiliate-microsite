@@ -3,7 +3,6 @@ import { useParams } from 'react-router-dom';
 import { trackPageView } from '../utils/storage';
 import { getCollectionBySlug, getDefaultCollection, getCollectionProducts } from '../utils/collections';
 import { trackCollectionView } from '../utils/analytics';
-import { fetchPreference, savePreference } from '../utils/api';
 import ProductCard from '../components/ProductCard';
 import EmptyState from '../components/EmptyState';
 import { getTheme, getPatternStyle } from '../utils/themes';
@@ -14,14 +13,11 @@ export default function Home() {
   const [currentRange, setCurrentRange] = useState(0);
   const [collection, setCollection] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [showCategory, setShowCategory] = useState(true); // Default true
-  const [preferencesLoaded, setPreferencesLoaded] = useState(false);
   const hasTrackedView = useRef(false);
   const ITEMS_PER_PAGE = 100;
 
   useEffect(() => {
     loadProducts();
-    loadPreferences();
     
     // Track page view only once per mount
     if (!hasTrackedView.current) {
@@ -29,19 +25,6 @@ export default function Home() {
       hasTrackedView.current = true;
     }
   }, [collectionSlug]);
-
-  const loadPreferences = async () => {
-    try {
-      const value = await fetchPreference('showCategory');
-      if (value !== null) {
-        setShowCategory(value === 'true');
-      }
-      setPreferencesLoaded(true);
-    } catch (error) {
-      console.error('Error loading preferences:', error);
-      setPreferencesLoaded(true);
-    }
-  };
 
   useEffect(() => {
     // Track collection view when collection changes
@@ -104,19 +87,6 @@ export default function Home() {
   const patternStyle = getPatternStyle(collection?.pattern || 'none');
   const enableAnimation = collection?.enable_animation !== 0;
 
-  const toggleShowCategory = async () => {
-    const newValue = !showCategory;
-    setShowCategory(newValue);
-    
-    try {
-      await savePreference('showCategory', String(newValue));
-    } catch (error) {
-      console.error('Error saving preference:', error);
-      // Revert on error
-      setShowCategory(!newValue);
-    }
-  };
-
   return (
     <div 
       className={`min-h-screen bg-gradient-to-br ${theme.bg} via-white to-gray-50 relative overflow-hidden`}
@@ -134,34 +104,12 @@ export default function Home() {
       {/* Header */}
       <header className={`bg-white/80 backdrop-blur-md shadow-sm border-b-4 ${theme.border} relative z-10 animate-slide-up`}>
         <div className="max-w-6xl mx-auto px-4 py-8">
-          <div className="flex items-start justify-between gap-4">
-            <div className="flex-1">
-              <h1 className={`text-4xl font-display font-bold bg-gradient-to-r ${theme.gradient} bg-clip-text text-transparent tracking-tight leading-tight mb-3`}>
-                {collection?.name || 'Produk Pilihan'}
-              </h1>
-              <p className="text-gray-600 text-lg font-sans leading-relaxed">
-                {collection?.description || 'Temukan produk terbaik untuk kebutuhan Anda'}
-              </p>
-            </div>
-            
-            {/* Category Toggle */}
-            <button
-              onClick={toggleShowCategory}
-              className={`flex items-center gap-2 px-4 py-2 rounded-xl font-display font-medium text-sm transition-all duration-300 ${
-                showCategory
-                  ? `bg-gradient-to-r ${theme.gradient} text-white shadow-md`
-                  : 'bg-white text-gray-700 border border-gray-300'
-              }`}
-              title={showCategory ? 'Sembunyikan Kategori' : 'Tampilkan Kategori'}
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-              </svg>
-              <span className="hidden sm:inline">
-                {showCategory ? 'Kategori' : 'Kategori'}
-              </span>
-            </button>
-          </div>
+          <h1 className={`text-4xl font-display font-bold bg-gradient-to-r ${theme.gradient} bg-clip-text text-transparent tracking-tight leading-tight mb-3`}>
+            {collection?.name || 'Produk Pilihan'}
+          </h1>
+          <p className="text-gray-600 text-lg font-sans leading-relaxed">
+            {collection?.description || 'Temukan produk terbaik untuk kebutuhan Anda'}
+          </p>
         </div>
       </header>
 
@@ -218,7 +166,7 @@ export default function Home() {
                     product={product} 
                     collectionId={collection?.id} 
                     theme={collection?.theme || 'blue'}
-                    showCategory={showCategory}
+                    showCategory={false}
                   />
                 </div>
               ))}

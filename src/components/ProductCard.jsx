@@ -105,18 +105,9 @@ export default function ProductCard({ product, collectionId, theme = 'blue', sho
           
           {/* Product Info */}
           <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-1">
-              <span className="text-xs font-mono opacity-75 tracking-wide">#{product.id}</span>
-              {showCategory && product.category && (
-                <span className="text-xs px-2 py-0.5 bg-white/20 rounded-full backdrop-blur-sm">
-                  {product.category}
-                </span>
-              )}
-            </div>
-            <span className="text-base font-semibold block truncate tracking-tight leading-snug">{product.name}</span>
-            {product.description && (
-              <span className="text-xs opacity-80 block truncate mt-1 leading-relaxed">{product.description}</span>
-            )}
+            <span className="text-base font-semibold block truncate tracking-tight leading-snug">
+              #{product.id} {product.name}
+            </span>
           </div>
           
           {/* Arrow Icon with glow effect */}

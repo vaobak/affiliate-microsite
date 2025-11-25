@@ -251,16 +251,20 @@ Jika ada pertanyaan atau issue, silakan buat issue di repository ini.
 
 Made with ❤️ using React + Vite + Tailwind CSS + Cloudflare D1
 
-**Version:** 2.2 (Preferences Sync)  
+**Version:** 2.3 (Simple Layout)  
 **Last Updated:** November 25, 2025
 
-## 🔄 **Latest Updates (v2.2)**
+## 🎨 **Latest Updates (v2.3)**
 
-### **New: Cross-Device Sync** 🌐
+### **New: Simplified Layout** ✨
+- ✅ **Clean Product Cards** - Hanya #ID dan Nama Produk
+- ✅ **No Category Display** - Tampilan lebih simple
+- ✅ **No Toggle Button** - Fokus pada konten
+- ✅ **Easier to Scan** - List produk lebih mudah dibaca
+
+### **Previous (v2.2): Cross-Device Sync** 🌐
 - ✅ **User Preferences in D1** - Settings sync across all devices
 - ✅ **No localStorage for Data** - All important data in database
-- ✅ **Persistent Settings** - Survive browser data clear
-- ✅ **Centralized Management** - Easy to add more preferences
 
 ### **Bug Fixes (v2.1):**
 1. ✅ **ID Reset Bug** - ID sekarang mulai dari 1 saat collection kosong
@@ -272,6 +276,6 @@ Made with ❤️ using React + Vite + Tailwind CSS + Cloudflare D1
 3. ✅ **Cross-Device Sync** - Setting sama di semua device
 
 **Documentation:**
+- `SIMPLE_LAYOUT_UPDATE.md` - Simple layout changes (v2.3)
 - `PREFERENCES_SYNC_MIGRATION.md` - Cross-device sync migration guide
 - `BUG_FIXES_IMPROVEMENTS.md` - Bug fixes & improvements
-- `CATEGORY_TOGGLE_GUIDE.md` - Category toggle feature guide
