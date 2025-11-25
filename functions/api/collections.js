@@ -30,16 +30,30 @@ export async function onRequestPost({ request, env }) {
     const collection = await request.json();
     const id = collection.slug || Date.now().toString();
     
-    await env.DB.prepare(
-      'INSERT INTO collections (id, name, slug, description, theme, is_default) VALUES (?, ?, ?, ?, ?, ?)'
-    ).bind(
-      id,
-      collection.name,
-      collection.slug || collection.name.toLowerCase().replace(/\s+/g, ''),
-      collection.description || '',
-      collection.theme || 'blue',
-      0
-    ).run();
+    // Try with theme column first, fallback to without theme if column doesn't exist
+    try {
+      await env.DB.prepare(
+        'INSERT INTO collections (id, name, slug, description, theme, is_default) VALUES (?, ?, ?, ?, ?, ?)'
+      ).bind(
+        id,
+        collection.name,
+        collection.slug || collection.name.toLowerCase().replace(/\s+/g, ''),
+        collection.description || '',
+        collection.theme || 'blue',
+        0
+      ).run();
+    } catch (err) {
+      // Fallback: theme column might not exist yet
+      await env.DB.prepare(
+        'INSERT INTO collections (id, name, slug, description, is_default) VALUES (?, ?, ?, ?, ?)'
+      ).bind(
+        id,
+        collection.name,
+        collection.slug || collection.name.toLowerCase().replace(/\s+/g, ''),
+        collection.description || '',
+        0
+      ).run();
+    }
     
     return new Response(JSON.stringify({ id, ...collection }), {
       headers: { 'Content-Type': 'application/json' }
@@ -56,15 +70,28 @@ export async function onRequestPut({ request, env }) {
   try {
     const { id, ...updates } = await request.json();
     
-    await env.DB.prepare(
-      'UPDATE collections SET name = ?, slug = ?, description = ?, theme = ?, updated_at = datetime("now") WHERE id = ?'
-    ).bind(
-      updates.name,
-      updates.slug,
-      updates.description || '',
-      updates.theme || 'blue',
-      id
-    ).run();
+    // Try with theme column first, fallback to without theme if column doesn't exist
+    try {
+      await env.DB.prepare(
+        'UPDATE collections SET name = ?, slug = ?, description = ?, theme = ?, updated_at = datetime("now") WHERE id = ?'
+      ).bind(
+        updates.name,
+        updates.slug,
+        updates.description || '',
+        updates.theme || 'blue',
+        id
+      ).run();
+    } catch (err) {
+      // Fallback: theme column might not exist yet
+      await env.DB.prepare(
+        'UPDATE collections SET name = ?, slug = ?, description = ?, updated_at = datetime("now") WHERE id = ?'
+      ).bind(
+        updates.name,
+        updates.slug,
+        updates.description || '',
+        id
+      ).run();
+    }
     
     return new Response(JSON.stringify({ success: true }), {
       headers: { 'Content-Type': 'application/json' }
