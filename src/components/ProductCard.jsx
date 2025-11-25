@@ -105,8 +105,9 @@ export default function ProductCard({ product, collectionId, theme = 'blue', sho
           
           {/* Product Info */}
           <div className="flex-1 min-w-0">
-            <span className="text-base font-semibold block truncate tracking-tight leading-snug">
-              #{product.id} {product.name}
+            <span className="block truncate leading-snug">
+              <span className="text-xl font-bold mr-2">#{product.id}</span>
+              <span className="text-lg font-semibold">{product.name}</span>
             </span>
           </div>
           
