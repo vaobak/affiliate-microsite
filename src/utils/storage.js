@@ -1,12 +1,11 @@
-// Storage utility - Now using Cloudflare D1 API with localStorage fallback
-// Analytics functions are re-exported from db.js
+// Storage utility - Using D1 with synchronous interface
 
 export {
   getPageViews,
   trackPageView
-} from './db';
+} from './db-sync';
 
-// Recent activity - keeping localStorage for now as it's UI-only
+// Recent activity - localStorage only (UI state)
 const ACTIVITY_KEY = 'recent_activity';
 
 export function getRecentActivity() {
@@ -28,13 +27,13 @@ export function addActivity(type, title, description) {
   localStorage.setItem(ACTIVITY_KEY, JSON.stringify(limited));
 }
 
-// Legacy functions for compatibility
+// Legacy compatibility
 export function getItems() {
   return [];
 }
 
 export function saveItems(items) {
-  // No-op, using D1 now
+  // No-op
 }
 
 export function addItem(item) {

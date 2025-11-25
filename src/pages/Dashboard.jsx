@@ -39,28 +39,27 @@ export default function Dashboard() {
 
   useEffect(() => {
     setLoading(true);
-    Promise.all([
-      loadStats(),
-      loadTopProducts()
-    ]).then(() => {
+    try {
+      loadStats();
       loadRecentActivity();
+      loadTopProducts();
       loadUnreadCount();
-      setLoading(false);
-    }).catch(error => {
+    } catch (error) {
       console.error('Error loading dashboard:', error);
+    } finally {
       setLoading(false);
-    });
+    }
   }, []);
 
   const loadUnreadCount = () => {
     setUnreadCount(getUnreadCount());
   };
 
-  const loadStats = async () => {
+  const loadStats = () => {
     try {
-      const cols = await getCollections();
+      const cols = getCollections();
       setCollections(cols);
-      const pageViews = await getPageViews();
+      const pageViews = getPageViews();
       
       // Calculate total products and clicks from all collections
       let totalProducts = 0;
@@ -94,9 +93,9 @@ export default function Dashboard() {
     setRecentActivity(activities.slice(0, 10));
   };
 
-  const loadTopProducts = async () => {
+  const loadTopProducts = () => {
     try {
-      const collections = await getCollections();
+      const collections = getCollections();
       
       // Collect all products from all collections
       let allProducts = [];
@@ -119,8 +118,8 @@ export default function Dashboard() {
     }
   };
 
-  const getChartData = async () => {
-    const clickHistory = await getClickHistory();
+  const getChartData = () => {
+    const clickHistory = getClickHistory();
     const now = new Date();
     
     if (timeRange === 'day') {
@@ -234,8 +233,8 @@ export default function Dashboard() {
   };
 
   // Get collection performance data with real growth calculation
-  const getCollectionPerformance = async () => {
-    const clickHistory = await getClickHistory();
+  const getCollectionPerformance = () => {
+    const clickHistory = getClickHistory();
     const now = new Date();
     const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
     const fourteenDaysAgo = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000);
