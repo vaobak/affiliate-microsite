@@ -83,19 +83,22 @@ export default function Home() {
   };
 
   const theme = getTheme(collection?.theme || 'blue');
-  const patternStyle = getPatternStyle(theme.pattern);
+  const patternStyle = getPatternStyle(collection?.pattern || 'none');
+  const enableAnimation = collection?.enable_animation !== 0;
 
   return (
     <div 
       className={`min-h-screen bg-gradient-to-br ${theme.bg} via-white to-gray-50 relative overflow-hidden`}
       style={patternStyle}
     >
-      {/* Decorative floating shapes */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className={`absolute top-20 left-10 w-72 h-72 bg-gradient-to-br ${theme.gradient} rounded-full opacity-5 blur-3xl animate-pulse`}></div>
-        <div className={`absolute bottom-20 right-10 w-96 h-96 bg-gradient-to-br ${theme.gradient} rounded-full opacity-5 blur-3xl animate-pulse delay-1000`}></div>
-        <div className={`absolute top-1/2 left-1/2 w-64 h-64 bg-gradient-to-br ${theme.gradient} rounded-full opacity-5 blur-3xl animate-pulse delay-500`}></div>
-      </div>
+      {/* Decorative floating shapes - only if animation enabled */}
+      {enableAnimation && (
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className={`absolute top-20 left-10 w-72 h-72 bg-gradient-to-br ${theme.gradient} rounded-full opacity-5 blur-3xl animate-pulse`}></div>
+          <div className={`absolute bottom-20 right-10 w-96 h-96 bg-gradient-to-br ${theme.gradient} rounded-full opacity-5 blur-3xl animate-pulse delay-1000`}></div>
+          <div className={`absolute top-1/2 left-1/2 w-64 h-64 bg-gradient-to-br ${theme.gradient} rounded-full opacity-5 blur-3xl animate-pulse delay-500`}></div>
+        </div>
+      )}
 
       {/* Header */}
       <header className={`bg-white/80 backdrop-blur-sm shadow-sm border-b-4 ${theme.border} relative z-10`}>

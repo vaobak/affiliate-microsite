@@ -3,14 +3,14 @@ import { useNavigate } from 'react-router-dom';
 import { getCollections, addCollection, deleteCollection, updateCollection } from '../utils/collections';
 import { useDarkMode } from '../hooks/useDarkMode';
 import Sidebar from '../components/Sidebar';
-import { getTheme, getThemeList } from '../utils/themes';
+import { getTheme, getThemeList, getPatternList } from '../utils/themes';
 
 export default function Collections() {
   const [collections, setCollections] = useState([]);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingCollection, setEditingCollection] = useState(null);
-  const [newCollection, setNewCollection] = useState({ name: '', slug: '', description: '', theme: 'blue' });
+  const [newCollection, setNewCollection] = useState({ name: '', slug: '', description: '', theme: 'blue', pattern: 'none', enableAnimation: true });
   const [deleteConfirm, setDeleteConfirm] = useState(null);
   const [viewMode, setViewMode] = useState('grid'); // 'grid' or 'list'
   const [isDark, toggleDarkMode] = useDarkMode();
@@ -39,10 +39,12 @@ export default function Collections() {
         name: newCollection.name.trim(),
         slug: slug,
         description: newCollection.description.trim(),
-        theme: newCollection.theme || 'blue'
+        theme: newCollection.theme || 'blue',
+        pattern: newCollection.pattern || 'none',
+        enableAnimation: newCollection.enableAnimation !== false
       });
       
-      setNewCollection({ name: '', slug: '', description: '', theme: 'blue' });
+      setNewCollection({ name: '', slug: '', description: '', theme: 'blue', pattern: 'none', enableAnimation: true });
       setShowAddModal(false);
       await loadCollections();
     } catch (error) {
@@ -75,7 +77,9 @@ export default function Collections() {
       name: collection.name,
       slug: collection.slug,
       description: collection.description,
-      theme: collection.theme || 'blue'
+      theme: collection.theme || 'blue',
+      pattern: collection.pattern || 'none',
+      enableAnimation: collection.enable_animation !== 0
     });
     setShowEditModal(true);
   };
@@ -88,7 +92,9 @@ export default function Collections() {
         name: editingCollection.name.trim(),
         slug: editingCollection.slug.trim() || editingCollection.name.toLowerCase().replace(/\s+/g, ''),
         description: editingCollection.description.trim(),
-        theme: editingCollection.theme || 'blue'
+        theme: editingCollection.theme || 'blue',
+        pattern: editingCollection.pattern || 'none',
+        enableAnimation: editingCollection.enableAnimation !== false
       });
       
       setEditingCollection(null);
@@ -308,6 +314,31 @@ export default function Collections() {
                   ))}
                 </div>
               </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Background Pattern</label>
+                <select
+                  value={editingCollection.pattern}
+                  onChange={(e) => setEditingCollection({...editingCollection, pattern: e.target.value})}
+                  className="w-full px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200 focus:border-blue-500 focus:outline-none"
+                >
+                  {getPatternList().map((pattern) => (
+                    <option key={pattern.value} value={pattern.value}>
+                      {pattern.label} - {pattern.description}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={editingCollection.enableAnimation}
+                    onChange={(e) => setEditingCollection({...editingCollection, enableAnimation: e.target.checked})}
+                    className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                  />
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Enable floating animations</span>
+                </label>
+              </div>
             </div>
             <div className="flex gap-4 mt-6">
               <button
@@ -389,6 +420,31 @@ export default function Collections() {
                     </button>
                   ))}
                 </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Background Pattern</label>
+                <select
+                  value={newCollection.pattern}
+                  onChange={(e) => setNewCollection({...newCollection, pattern: e.target.value})}
+                  className="w-full px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200 focus:border-blue-500 focus:outline-none"
+                >
+                  {getPatternList().map((pattern) => (
+                    <option key={pattern.value} value={pattern.value}>
+                      {pattern.label} - {pattern.description}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={newCollection.enableAnimation}
+                    onChange={(e) => setNewCollection({...newCollection, enableAnimation: e.target.checked})}
+                    className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                  />
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Enable floating animations</span>
+                </label>
               </div>
             </div>
             <div className="flex gap-4 mt-6">

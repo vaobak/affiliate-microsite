@@ -30,29 +30,45 @@ export async function onRequestPost({ request, env }) {
     const collection = await request.json();
     const id = collection.slug || Date.now().toString();
     
-    // Try with theme column first, fallback to without theme if column doesn't exist
+    // Try with all columns first, fallback if columns don't exist
     try {
       await env.DB.prepare(
-        'INSERT INTO collections (id, name, slug, description, theme, is_default) VALUES (?, ?, ?, ?, ?, ?)'
+        'INSERT INTO collections (id, name, slug, description, theme, pattern, enable_animation, is_default) VALUES (?, ?, ?, ?, ?, ?, ?, ?)'
       ).bind(
         id,
         collection.name,
         collection.slug || collection.name.toLowerCase().replace(/\s+/g, ''),
         collection.description || '',
         collection.theme || 'blue',
+        collection.pattern || 'none',
+        collection.enableAnimation !== false ? 1 : 0,
         0
       ).run();
     } catch (err) {
-      // Fallback: theme column might not exist yet
-      await env.DB.prepare(
-        'INSERT INTO collections (id, name, slug, description, is_default) VALUES (?, ?, ?, ?, ?)'
-      ).bind(
-        id,
-        collection.name,
-        collection.slug || collection.name.toLowerCase().replace(/\s+/g, ''),
-        collection.description || '',
-        0
-      ).run();
+      // Fallback: new columns might not exist yet
+      try {
+        await env.DB.prepare(
+          'INSERT INTO collections (id, name, slug, description, theme, is_default) VALUES (?, ?, ?, ?, ?, ?)'
+        ).bind(
+          id,
+          collection.name,
+          collection.slug || collection.name.toLowerCase().replace(/\s+/g, ''),
+          collection.description || '',
+          collection.theme || 'blue',
+          0
+        ).run();
+      } catch (err2) {
+        // Final fallback: no theme column
+        await env.DB.prepare(
+          'INSERT INTO collections (id, name, slug, description, is_default) VALUES (?, ?, ?, ?, ?)'
+        ).bind(
+          id,
+          collection.name,
+          collection.slug || collection.name.toLowerCase().replace(/\s+/g, ''),
+          collection.description || '',
+          0
+        ).run();
+      }
     }
     
     return new Response(JSON.stringify({ id, ...collection }), {
@@ -70,27 +86,42 @@ export async function onRequestPut({ request, env }) {
   try {
     const { id, ...updates } = await request.json();
     
-    // Try with theme column first, fallback to without theme if column doesn't exist
+    // Try with all columns first, fallback if columns don't exist
     try {
       await env.DB.prepare(
-        'UPDATE collections SET name = ?, slug = ?, description = ?, theme = ?, updated_at = datetime("now") WHERE id = ?'
+        'UPDATE collections SET name = ?, slug = ?, description = ?, theme = ?, pattern = ?, enable_animation = ?, updated_at = datetime("now") WHERE id = ?'
       ).bind(
         updates.name,
         updates.slug,
         updates.description || '',
         updates.theme || 'blue',
+        updates.pattern || 'none',
+        updates.enableAnimation !== false ? 1 : 0,
         id
       ).run();
     } catch (err) {
-      // Fallback: theme column might not exist yet
-      await env.DB.prepare(
-        'UPDATE collections SET name = ?, slug = ?, description = ?, updated_at = datetime("now") WHERE id = ?'
-      ).bind(
-        updates.name,
-        updates.slug,
-        updates.description || '',
-        id
-      ).run();
+      // Fallback: new columns might not exist yet
+      try {
+        await env.DB.prepare(
+          'UPDATE collections SET name = ?, slug = ?, description = ?, theme = ?, updated_at = datetime("now") WHERE id = ?'
+        ).bind(
+          updates.name,
+          updates.slug,
+          updates.description || '',
+          updates.theme || 'blue',
+          id
+        ).run();
+      } catch (err2) {
+        // Final fallback: no theme column
+        await env.DB.prepare(
+          'UPDATE collections SET name = ?, slug = ?, description = ?, updated_at = datetime("now") WHERE id = ?'
+        ).bind(
+          updates.name,
+          updates.slug,
+          updates.description || '',
+          id
+        ).run();
+      }
     }
     
     return new Response(JSON.stringify({ success: true }), {
