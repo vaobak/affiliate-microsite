@@ -228,7 +228,7 @@ export default function CollectionProducts() {
       setImportStatus({ type: 'loading', message: 'Mengimport produk (Replace Mode)...' });
       
       const reader = new FileReader();
-      reader.onload = (event) => {
+      reader.onload = async (event) => {
         try {
           const data = new Uint8Array(event.target.result);
           const workbook = XLSX.read(data, { type: 'array' });
@@ -242,9 +242,9 @@ export default function CollectionProducts() {
             return;
           }
 
-          const result = importProductsReplaceToCollection(collectionId, jsonData);
+          const result = await importProductsReplaceToCollection(collectionId, jsonData);
           
-          loadData();
+          await loadData();
           setImportStatus({ 
             type: 'success', 
             message: `Import Replace berhasil! ${result.imported} produk diimport. Total produk: ${result.total}` 
@@ -278,7 +278,7 @@ export default function CollectionProducts() {
       setImportStatus({ type: 'loading', message: 'Mengimport produk (New Mode)...' });
       
       const reader = new FileReader();
-      reader.onload = (event) => {
+      reader.onload = async (event) => {
         try {
           const data = new Uint8Array(event.target.result);
           const workbook = XLSX.read(data, { type: 'array' });
@@ -292,9 +292,9 @@ export default function CollectionProducts() {
             return;
           }
 
-          const result = importProductsNewToCollection(collectionId, jsonData);
+          const result = await importProductsNewToCollection(collectionId, jsonData);
           
-          loadData();
+          await loadData();
           setImportStatus({ 
             type: 'success', 
             message: `Import New berhasil! ${result.imported} produk baru ditambahkan. Total produk: ${result.total}` 
