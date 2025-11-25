@@ -4,7 +4,7 @@ import { trackPageView } from '../utils/storage';
 import { getCollectionBySlug, getDefaultCollection, getCollectionProducts } from '../utils/collections';
 import { trackCollectionView } from '../utils/analytics';
 import ProductCard from '../components/ProductCard';
-import { getTheme } from '../utils/themes';
+import { getTheme, getPatternStyle } from '../utils/themes';
 
 export default function Home() {
   const { collection: collectionSlug } = useParams();
@@ -83,11 +83,22 @@ export default function Home() {
   };
 
   const theme = getTheme(collection?.theme || 'blue');
+  const patternStyle = getPatternStyle(theme.pattern);
 
   return (
-    <div className={`min-h-screen bg-gradient-to-br ${theme.bg} via-white to-gray-50`}>
+    <div 
+      className={`min-h-screen bg-gradient-to-br ${theme.bg} via-white to-gray-50 relative overflow-hidden`}
+      style={patternStyle}
+    >
+      {/* Decorative floating shapes */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className={`absolute top-20 left-10 w-72 h-72 bg-gradient-to-br ${theme.gradient} rounded-full opacity-5 blur-3xl animate-pulse`}></div>
+        <div className={`absolute bottom-20 right-10 w-96 h-96 bg-gradient-to-br ${theme.gradient} rounded-full opacity-5 blur-3xl animate-pulse delay-1000`}></div>
+        <div className={`absolute top-1/2 left-1/2 w-64 h-64 bg-gradient-to-br ${theme.gradient} rounded-full opacity-5 blur-3xl animate-pulse delay-500`}></div>
+      </div>
+
       {/* Header */}
-      <header className={`bg-white shadow-sm border-b-4 ${theme.border}`}>
+      <header className={`bg-white/80 backdrop-blur-sm shadow-sm border-b-4 ${theme.border} relative z-10`}>
         <div className="max-w-6xl mx-auto px-4 py-6">
           <h1 className={`text-3xl font-bold bg-gradient-to-r ${theme.gradient} bg-clip-text text-transparent`}>
             {collection?.name || 'Produk Pilihan'}
@@ -99,7 +110,7 @@ export default function Home() {
       </header>
 
       {/* Content */}
-      <main className="max-w-4xl mx-auto px-4 py-12">
+      <main className="max-w-4xl mx-auto px-4 py-12 relative z-10">
         {loading ? (
           <div className="text-center py-20">
             <div className="w-16 h-16 mx-auto mb-4 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>

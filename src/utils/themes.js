@@ -1,4 +1,4 @@
-// Collection Theme Colors
+// Collection Theme Colors with Patterns
 
 export const THEMES = {
   blue: {
@@ -8,7 +8,8 @@ export const THEMES = {
     border: 'border-blue-200 dark:border-blue-800',
     text: 'text-blue-600 dark:text-blue-400',
     hover: 'hover:bg-blue-100 dark:hover:bg-blue-900/30',
-    badge: 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400'
+    badge: 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400',
+    pattern: 'dots' // dots, grid, waves, diagonal
   },
   purple: {
     name: 'Purple',
@@ -17,7 +18,8 @@ export const THEMES = {
     border: 'border-purple-200 dark:border-purple-800',
     text: 'text-purple-600 dark:text-purple-400',
     hover: 'hover:bg-purple-100 dark:hover:bg-purple-900/30',
-    badge: 'bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400'
+    badge: 'bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400',
+    pattern: 'waves'
   },
   green: {
     name: 'Green',
@@ -26,7 +28,8 @@ export const THEMES = {
     border: 'border-green-200 dark:border-green-800',
     text: 'text-green-600 dark:text-green-400',
     hover: 'hover:bg-green-100 dark:hover:bg-green-900/30',
-    badge: 'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400'
+    badge: 'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400',
+    pattern: 'grid'
   },
   red: {
     name: 'Red',
@@ -35,7 +38,8 @@ export const THEMES = {
     border: 'border-red-200 dark:border-red-800',
     text: 'text-red-600 dark:text-red-400',
     hover: 'hover:bg-red-100 dark:hover:bg-red-900/30',
-    badge: 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400'
+    badge: 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400',
+    pattern: 'diagonal'
   },
   orange: {
     name: 'Orange',
@@ -44,7 +48,8 @@ export const THEMES = {
     border: 'border-orange-200 dark:border-orange-800',
     text: 'text-orange-600 dark:text-orange-400',
     hover: 'hover:bg-orange-100 dark:hover:bg-orange-900/30',
-    badge: 'bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400'
+    badge: 'bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400',
+    pattern: 'dots'
   },
   pink: {
     name: 'Pink',
@@ -53,7 +58,8 @@ export const THEMES = {
     border: 'border-pink-200 dark:border-pink-800',
     text: 'text-pink-600 dark:text-pink-400',
     hover: 'hover:bg-pink-100 dark:hover:bg-pink-900/30',
-    badge: 'bg-pink-100 dark:bg-pink-900/30 text-pink-600 dark:text-pink-400'
+    badge: 'bg-pink-100 dark:bg-pink-900/30 text-pink-600 dark:text-pink-400',
+    pattern: 'waves'
   },
   indigo: {
     name: 'Indigo',
@@ -62,7 +68,8 @@ export const THEMES = {
     border: 'border-indigo-200 dark:border-indigo-800',
     text: 'text-indigo-600 dark:text-indigo-400',
     hover: 'hover:bg-indigo-100 dark:hover:bg-indigo-900/30',
-    badge: 'bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400'
+    badge: 'bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400',
+    pattern: 'grid'
   },
   teal: {
     name: 'Teal',
@@ -71,7 +78,8 @@ export const THEMES = {
     border: 'border-teal-200 dark:border-teal-800',
     text: 'text-teal-600 dark:text-teal-400',
     hover: 'hover:bg-teal-100 dark:hover:bg-teal-900/30',
-    badge: 'bg-teal-100 dark:bg-teal-900/30 text-teal-600 dark:text-teal-400'
+    badge: 'bg-teal-100 dark:bg-teal-900/30 text-teal-600 dark:text-teal-400',
+    pattern: 'diagonal'
   }
 };
 
@@ -85,4 +93,26 @@ export const getThemeList = () => {
     label: THEMES[key].name,
     gradient: THEMES[key].gradient
   }));
+};
+
+// Get background pattern style
+export const getPatternStyle = (pattern, color = 'rgba(0,0,0,0.03)') => {
+  const patterns = {
+    dots: `radial-gradient(circle, ${color} 1px, transparent 1px)`,
+    grid: `linear-gradient(${color} 1px, transparent 1px), linear-gradient(90deg, ${color} 1px, transparent 1px)`,
+    waves: `repeating-linear-gradient(45deg, transparent, transparent 10px, ${color} 10px, ${color} 20px)`,
+    diagonal: `repeating-linear-gradient(-45deg, transparent, transparent 20px, ${color} 20px, ${color} 21px)`
+  };
+  
+  const sizes = {
+    dots: '20px 20px',
+    grid: '20px 20px',
+    waves: 'auto',
+    diagonal: 'auto'
+  };
+  
+  return {
+    backgroundImage: patterns[pattern] || patterns.dots,
+    backgroundSize: sizes[pattern] || '20px 20px'
+  };
 };
