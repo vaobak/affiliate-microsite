@@ -19,6 +19,16 @@ export async function createCollection(collection) {
   return response.json();
 }
 
+export async function updateCollection(id, updates) {
+  const response = await fetch(`${API_BASE}/collections`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ id, ...updates })
+  });
+  if (!response.ok) throw new Error('Failed to update collection');
+  return response.json();
+}
+
 export async function deleteCollection(id) {
   const response = await fetch(`${API_BASE}/collections`, {
     method: 'DELETE',

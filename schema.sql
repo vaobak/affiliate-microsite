@@ -6,6 +6,7 @@ CREATE TABLE IF NOT EXISTS collections (
   name TEXT NOT NULL,
   slug TEXT UNIQUE NOT NULL,
   description TEXT,
+  theme TEXT DEFAULT 'blue',
   is_default INTEGER DEFAULT 0,
   created_at TEXT DEFAULT (datetime('now')),
   updated_at TEXT DEFAULT (datetime('now'))

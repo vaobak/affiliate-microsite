@@ -31,16 +31,42 @@ export async function onRequestPost({ request, env }) {
     const id = collection.slug || Date.now().toString();
     
     await env.DB.prepare(
-      'INSERT INTO collections (id, name, slug, description, is_default) VALUES (?, ?, ?, ?, ?)'
+      'INSERT INTO collections (id, name, slug, description, theme, is_default) VALUES (?, ?, ?, ?, ?, ?)'
     ).bind(
       id,
       collection.name,
       collection.slug || collection.name.toLowerCase().replace(/\s+/g, ''),
       collection.description || '',
+      collection.theme || 'blue',
       0
     ).run();
     
     return new Response(JSON.stringify({ id, ...collection }), {
+      headers: { 'Content-Type': 'application/json' }
+    });
+  } catch (error) {
+    return new Response(JSON.stringify({ error: error.message }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
+}
+
+export async function onRequestPut({ request, env }) {
+  try {
+    const { id, ...updates } = await request.json();
+    
+    await env.DB.prepare(
+      'UPDATE collections SET name = ?, slug = ?, description = ?, theme = ?, updated_at = datetime("now") WHERE id = ?'
+    ).bind(
+      updates.name,
+      updates.slug,
+      updates.description || '',
+      updates.theme || 'blue',
+      id
+    ).run();
+    
+    return new Response(JSON.stringify({ success: true }), {
       headers: { 'Content-Type': 'application/json' }
     });
   } catch (error) {

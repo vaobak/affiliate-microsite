@@ -44,13 +44,8 @@ export async function addCollection(collection) {
 // Update collection
 export async function updateCollection(id, updates) {
   try {
-    // Note: API doesn't have update endpoint yet, so we'll handle it client-side
-    const collections = await getCollections();
-    const collection = collections.find(c => c.id === id);
-    if (collection) {
-      Object.assign(collection, updates);
-    }
-    return collection;
+    await api.updateCollection(id, updates);
+    return true;
   } catch (error) {
     console.error('Error updating collection:', error);
     throw error;

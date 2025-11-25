@@ -3,13 +3,14 @@ import { useNavigate } from 'react-router-dom';
 import { getCollections, addCollection, deleteCollection, updateCollection } from '../utils/collections';
 import { useDarkMode } from '../hooks/useDarkMode';
 import Sidebar from '../components/Sidebar';
+import { getTheme, getThemeList } from '../utils/themes';
 
 export default function Collections() {
   const [collections, setCollections] = useState([]);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingCollection, setEditingCollection] = useState(null);
-  const [newCollection, setNewCollection] = useState({ name: '', slug: '', description: '' });
+  const [newCollection, setNewCollection] = useState({ name: '', slug: '', description: '', theme: 'blue' });
   const [deleteConfirm, setDeleteConfirm] = useState(null);
   const [viewMode, setViewMode] = useState('grid'); // 'grid' or 'list'
   const [isDark, toggleDarkMode] = useDarkMode();
@@ -37,10 +38,11 @@ export default function Collections() {
       await addCollection({
         name: newCollection.name.trim(),
         slug: slug,
-        description: newCollection.description.trim()
+        description: newCollection.description.trim(),
+        theme: newCollection.theme || 'blue'
       });
       
-      setNewCollection({ name: '', slug: '', description: '' });
+      setNewCollection({ name: '', slug: '', description: '', theme: 'blue' });
       setShowAddModal(false);
       await loadCollections();
     } catch (error) {
@@ -72,7 +74,8 @@ export default function Collections() {
       id: collection.id,
       name: collection.name,
       slug: collection.slug,
-      description: collection.description
+      description: collection.description,
+      theme: collection.theme || 'blue'
     });
     setShowEditModal(true);
   };
@@ -84,7 +87,8 @@ export default function Collections() {
       await updateCollection(editingCollection.id, {
         name: editingCollection.name.trim(),
         slug: editingCollection.slug.trim() || editingCollection.name.toLowerCase().replace(/\s+/g, ''),
-        description: editingCollection.description.trim()
+        description: editingCollection.description.trim(),
+        theme: editingCollection.theme || 'blue'
       });
       
       setEditingCollection(null);
@@ -274,6 +278,30 @@ export default function Collections() {
                   placeholder="Description..."
                 />
               </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Theme Color</label>
+                <div className="grid grid-cols-4 gap-2">
+                  {getThemeList().map((theme) => (
+                    <button
+                      key={theme.value}
+                      type="button"
+                      onClick={() => setEditingCollection({...editingCollection, theme: theme.value})}
+                      className={`relative h-12 rounded-lg bg-gradient-to-r ${theme.gradient} transition-all ${
+                        editingCollection.theme === theme.value 
+                          ? 'ring-2 ring-offset-2 ring-gray-400 dark:ring-gray-600 scale-105' 
+                          : 'hover:scale-105'
+                      }`}
+                      title={theme.label}
+                    >
+                      {editingCollection.theme === theme.value && (
+                        <svg className="w-6 h-6 text-white absolute inset-0 m-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                        </svg>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              </div>
             </div>
             <div className="flex gap-4 mt-6">
               <button
@@ -331,6 +359,30 @@ export default function Collections() {
                   rows="3"
                   placeholder="Description..."
                 />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Theme Color</label>
+                <div className="grid grid-cols-4 gap-2">
+                  {getThemeList().map((theme) => (
+                    <button
+                      key={theme.value}
+                      type="button"
+                      onClick={() => setNewCollection({...newCollection, theme: theme.value})}
+                      className={`relative h-12 rounded-lg bg-gradient-to-r ${theme.gradient} transition-all ${
+                        newCollection.theme === theme.value 
+                          ? 'ring-2 ring-offset-2 ring-gray-400 dark:ring-gray-600 scale-105' 
+                          : 'hover:scale-105'
+                      }`}
+                      title={theme.label}
+                    >
+                      {newCollection.theme === theme.value && (
+                        <svg className="w-6 h-6 text-white absolute inset-0 m-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                        </svg>
+                      )}
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
             <div className="flex gap-4 mt-6">
