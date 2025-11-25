@@ -1,127 +1,117 @@
 // Bulk operations utility functions for products
 
-import { getCollections, saveCollections } from './collections';
+import * as api from './api';
 
 // Bulk delete products from a collection
-export function bulkDeleteProducts(collectionId, productIds) {
-  const collections = getCollections();
-  const collectionIndex = collections.findIndex(c => c.id === collectionId || c.slug === collectionId);
-  
-  if (collectionIndex === -1) {
-    throw new Error('Collection not found');
+export async function bulkDeleteProducts(collectionId, productIds) {
+  try {
+    let deleted = 0;
+    for (const productId of productIds) {
+      await api.deleteProduct(productId);
+      deleted++;
+    }
+    
+    return {
+      success: true,
+      deleted: deleted
+    };
+  } catch (error) {
+    console.error('Error bulk deleting products:', error);
+    throw new Error('Failed to delete products: ' + error.message);
   }
-
-  collections[collectionIndex].products = collections[collectionIndex].products.filter(
-    p => !productIds.includes(p.id)
-  );
-
-  saveCollections(collections);
-  return {
-    success: true,
-    deleted: productIds.length
-  };
 }
 
 // Bulk update products (category, badge)
-export function bulkUpdateProducts(collectionId, productIds, updates) {
-  const collections = getCollections();
-  const collectionIndex = collections.findIndex(c => c.id === collectionId || c.slug === collectionId);
-  
-  if (collectionIndex === -1) {
-    throw new Error('Collection not found');
-  }
-
-  let updatedCount = 0;
-  collections[collectionIndex].products = collections[collectionIndex].products.map(product => {
-    if (productIds.includes(product.id)) {
-      updatedCount++;
-      return {
-        ...product,
-        ...updates
-      };
+export async function bulkUpdateProducts(collectionId, productIds, updates) {
+  try {
+    let updated = 0;
+    for (const productId of productIds) {
+      await api.updateProduct(productId, updates);
+      updated++;
     }
-    return product;
-  });
-
-  saveCollections(collections);
-  return {
-    success: true,
-    updated: updatedCount
-  };
+    
+    return {
+      success: true,
+      updated: updated
+    };
+  } catch (error) {
+    console.error('Error bulk updating products:', error);
+    throw new Error('Failed to update products: ' + error.message);
+  }
 }
 
 // Bulk move products to another collection
-export function bulkMoveProducts(sourceCollectionId, targetCollectionId, productIds) {
-  const collections = getCollections();
-  const sourceIndex = collections.findIndex(c => c.id === sourceCollectionId || c.slug === sourceCollectionId);
-  const targetIndex = collections.findIndex(c => c.id === targetCollectionId || c.slug === targetCollectionId);
-  
-  if (sourceIndex === -1 || targetIndex === -1) {
-    throw new Error('Collection not found');
+export async function bulkMoveProducts(sourceCollectionId, targetCollectionId, productIds) {
+  try {
+    let moved = 0;
+    
+    // Get source products
+    const sourceProducts = await api.fetchProducts(sourceCollectionId);
+    
+    for (const productId of productIds) {
+      const product = sourceProducts.find(p => p.id === productId);
+      if (!product) continue;
+      
+      // Create product in target collection
+      await api.createProduct({
+        collectionId: targetCollectionId,
+        name: product.name,
+        description: product.description || '',
+        price: product.price || 0,
+        affiliateLink: product.affiliate_link || product.affiliateLink,
+        imageUrl: product.image_url || product.imageUrl || '',
+        category: product.category || 'Uncategorized',
+        badge: product.badge || ''
+      });
+      
+      // Delete from source collection
+      await api.deleteProduct(productId);
+      moved++;
+    }
+    
+    return {
+      success: true,
+      moved: moved
+    };
+  } catch (error) {
+    console.error('Error bulk moving products:', error);
+    throw new Error('Failed to move products: ' + error.message);
   }
-
-  // Get products to move
-  const productsToMove = collections[sourceIndex].products.filter(p => productIds.includes(p.id));
-  
-  // Get max ID in target collection
-  const targetProducts = collections[targetIndex].products || [];
-  const maxId = targetProducts.length > 0 
-    ? Math.max(...targetProducts.map(p => p.id)) 
-    : 0;
-
-  // Assign new IDs to moved products
-  const movedProducts = productsToMove.map((product, index) => ({
-    ...product,
-    id: maxId + index + 1
-  }));
-
-  // Remove from source
-  collections[sourceIndex].products = collections[sourceIndex].products.filter(
-    p => !productIds.includes(p.id)
-  );
-
-  // Add to target
-  collections[targetIndex].products = [...targetProducts, ...movedProducts];
-
-  saveCollections(collections);
-  return {
-    success: true,
-    moved: movedProducts.length
-  };
 }
 
 // Bulk duplicate products to another collection
-export function bulkDuplicateProducts(sourceCollectionId, targetCollectionId, productIds) {
-  const collections = getCollections();
-  const sourceIndex = collections.findIndex(c => c.id === sourceCollectionId || c.slug === sourceCollectionId);
-  const targetIndex = collections.findIndex(c => c.id === targetCollectionId || c.slug === targetCollectionId);
-  
-  if (sourceIndex === -1 || targetIndex === -1) {
-    throw new Error('Collection not found');
+export async function bulkDuplicateProducts(sourceCollectionId, targetCollectionId, productIds) {
+  try {
+    let duplicated = 0;
+    
+    // Get source products
+    const sourceProducts = await api.fetchProducts(sourceCollectionId);
+    
+    for (const productId of productIds) {
+      const product = sourceProducts.find(p => p.id === productId);
+      if (!product) continue;
+      
+      // Create duplicate in target collection
+      await api.createProduct({
+        collectionId: targetCollectionId,
+        name: product.name,
+        description: product.description || '',
+        price: product.price || 0,
+        affiliateLink: product.affiliate_link || product.affiliateLink,
+        imageUrl: product.image_url || product.imageUrl || '',
+        category: product.category || 'Uncategorized',
+        badge: product.badge || ''
+      });
+      
+      duplicated++;
+    }
+    
+    return {
+      success: true,
+      duplicated: duplicated
+    };
+  } catch (error) {
+    console.error('Error bulk duplicating products:', error);
+    throw new Error('Failed to duplicate products: ' + error.message);
   }
-
-  // Get products to duplicate
-  const productsToDuplicate = collections[sourceIndex].products.filter(p => productIds.includes(p.id));
-  
-  // Get max ID in target collection
-  const targetProducts = collections[targetIndex].products || [];
-  const maxId = targetProducts.length > 0 
-    ? Math.max(...targetProducts.map(p => p.id)) 
-    : 0;
-
-  // Create duplicates with new IDs
-  const duplicatedProducts = productsToDuplicate.map((product, index) => ({
-    ...product,
-    id: maxId + index + 1,
-    createdAt: new Date().toISOString()
-  }));
-
-  // Add to target (source remains unchanged)
-  collections[targetIndex].products = [...targetProducts, ...duplicatedProducts];
-
-  saveCollections(collections);
-  return {
-    success: true,
-    duplicated: duplicatedProducts.length
-  };
 }
