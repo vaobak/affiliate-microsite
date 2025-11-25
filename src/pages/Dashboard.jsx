@@ -29,6 +29,8 @@ export default function Dashboard() {
   const [hoveredCollection, setHoveredCollection] = useState(null);
   const [chartData, setChartData] = useState([]);
   const [collectionPerformance, setCollectionPerformance] = useState([]);
+  const [lowPerformingProducts, setLowPerformingProducts] = useState([]);
+  const [categoryDistribution, setCategoryDistribution] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
@@ -56,6 +58,10 @@ export default function Dashboard() {
       // Load chart data
       await loadChartData();
       await loadCollectionPerformanceData();
+      
+      // Load other data
+      loadLowPerformingProducts();
+      loadCategoryDistribution();
       
       setLoading(false);
     } catch (err) {
@@ -85,15 +91,40 @@ export default function Dashboard() {
     }
   };
 
+  const loadLowPerformingProducts = () => {
+    try {
+      const data = getLowPerformingProducts();
+      setLowPerformingProducts(data);
+    } catch (error) {
+      console.error('Error loading low performing products:', error);
+      setLowPerformingProducts([]);
+    }
+  };
+
+  const loadCategoryDistribution = () => {
+    try {
+      const data = getCategoryDistribution();
+      setCategoryDistribution(data);
+    } catch (error) {
+      console.error('Error loading category distribution:', error);
+      setCategoryDistribution([]);
+    }
+  };
+
   const loadUnreadCount = () => {
     setUnreadCount(getUnreadCount());
   };
 
   const loadStats = async () => {
     try {
+      console.log('Loading collections...');
       const cols = await getCollections();
+      console.log('Collections loaded:', cols);
       setCollections(cols);
+      
+      console.log('Loading page views...');
       const pageViews = await getPageViews();
+      console.log('Page views loaded:', pageViews);
       
       // Calculate total products and clicks from all collections
       let totalProducts = 0;
@@ -117,8 +148,11 @@ export default function Dashboard() {
         avgCTR: avgCTR,
         pageViews: pageViews
       });
+      
+      console.log('Stats loaded successfully');
     } catch (error) {
       console.error('Error loading stats:', error);
+      throw error; // Re-throw to be caught by loadAllData
     }
   };
 
@@ -824,7 +858,7 @@ export default function Dashboard() {
                 </div>
                 <span className="text-sm text-gray-500 dark:text-gray-400">Need attention</span>
               </div>
-              {getLowPerformingProducts().length === 0 ? (
+              {lowPerformingProducts.length === 0 ? (
                 <div className="text-center py-8">
                   <svg className="w-12 h-12 text-green-500 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -833,7 +867,7 @@ export default function Dashboard() {
                 </div>
               ) : (
                 <div className="space-y-2">
-                  {getLowPerformingProducts().map((product) => (
+                  {lowPerformingProducts.map((product) => (
                     <div key={product.id} className="flex items-center justify-between p-3 bg-orange-50 dark:bg-orange-900/10 rounded-lg border border-orange-200 dark:border-orange-800">
                       <div className="flex-1 min-w-0">
                         <p className="font-medium text-gray-800 dark:text-gray-200 truncate">{product.name}</p>
@@ -857,7 +891,7 @@ export default function Dashboard() {
             <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
               <h3 className="text-lg font-bold text-gray-800 dark:text-gray-200 mb-4">Category Distribution</h3>
               <div className="space-y-4">
-                {getCategoryDistribution().map((category, index) => (
+                {categoryDistribution.map((category, index) => (
                   <div key={category.name}>
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{category.name}</span>
