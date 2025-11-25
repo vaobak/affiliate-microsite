@@ -1,0 +1,94 @@
+2025-11-25T03:46:36.15185Z	Cloning repository...
+2025-11-25T03:46:36.916612Z	From https://github.com/vaobak/affiliate-microsite
+2025-11-25T03:46:36.917384Z	 * branch            c5540f6f879c14ebd2c9ece0eaa6df35e4f264e4 -> FETCH_HEAD
+2025-11-25T03:46:36.917513Z	
+2025-11-25T03:46:36.953247Z	HEAD is now at c5540f6 Merge branch 'main' of https://github.com/vaobak/affiliate-microsite
+2025-11-25T03:46:36.953647Z	
+2025-11-25T03:46:37.03352Z	
+2025-11-25T03:46:37.033905Z	Using v2 root directory strategy
+2025-11-25T03:46:37.056725Z	Success: Finished cloning repository files
+2025-11-25T03:46:38.970481Z	Checking for configuration in a Wrangler configuration file (BETA)
+2025-11-25T03:46:38.971176Z	
+2025-11-25T03:46:38.972811Z	Found wrangler.toml file. Reading build configuration...
+2025-11-25T03:46:38.979291Z	pages_build_output_dir: dist
+2025-11-25T03:46:38.97945Z	Build environment variables: (none found)
+2025-11-25T03:46:40.076268Z	Successfully read wrangler.toml file.
+2025-11-25T03:46:40.145332Z	Detected the following tools from environment: npm@10.9.2, nodejs@22.16.0
+2025-11-25T03:46:40.145893Z	Installing project dependencies: npm clean-install --progress=false
+2025-11-25T03:46:44.579257Z	
+2025-11-25T03:46:44.579495Z	added 240 packages, and audited 241 packages in 4s
+2025-11-25T03:46:44.579584Z	
+2025-11-25T03:46:44.579784Z	53 packages are looking for funding
+2025-11-25T03:46:44.579889Z	  run `npm fund` for details
+2025-11-25T03:46:44.582392Z	
+2025-11-25T03:46:44.582738Z	1 high severity vulnerability
+2025-11-25T03:46:44.582835Z	
+2025-11-25T03:46:44.582953Z	Some issues need review, and may require choosing
+2025-11-25T03:46:44.583282Z	a different dependency.
+2025-11-25T03:46:44.583416Z	
+2025-11-25T03:46:44.583496Z	Run `npm audit` for details.
+2025-11-25T03:46:44.612664Z	Executing user command: npm run build
+2025-11-25T03:46:44.994373Z	
+2025-11-25T03:46:44.994625Z	> affiliate-microsite@1.0.0 build
+2025-11-25T03:46:44.994969Z	> vite build
+2025-11-25T03:46:44.995292Z	
+2025-11-25T03:46:45.265885Z	[36mrolldown-vite v7.2.5 [32mbuilding client environment for production...[36m[39m
+2025-11-25T03:46:45.966899Z	[2Ktransforming...✓ 49 modules transformed.
+2025-11-25T03:46:46.015374Z	rendering chunks...
+2025-11-25T03:46:46.044103Z	[33m[plugin builtin:reporter] 
+2025-11-25T03:46:46.044699Z	(!) /opt/buildhome/repo/src/utils/db.js is dynamically imported by /opt/buildhome/repo/src/utils/analytics.js but also statically imported by /opt/buildhome/repo/src/utils/analytics.js, /opt/buildhome/repo/src/utils/collections.js, /opt/buildhome/repo/src/utils/storage.js, dynamic import will not move module into another chunk.
+2025-11-25T03:46:46.045179Z	[39m
+2025-11-25T03:46:46.193776Z	[31m✗[39m Build failed in 926ms
+2025-11-25T03:46:46.194172Z	[31merror during build:
+2025-11-25T03:46:46.194351Z	[31mBuild failed with 5 errors:
+2025-11-25T03:46:46.194525Z	
+2025-11-25T03:46:46.194643Z	[31m[MISSING_EXPORT] Error:[0m "migrateOldProducts" is not exported by "src/utils/collections.js".
+2025-11-25T03:46:46.194759Z	    [38;5;246m╭[0m[38;5;246m─[0m[38;5;246m[[0m src/App.jsx:11:10 [38;5;246m][0m
+2025-11-25T03:46:46.194883Z	    [38;5;246m│[0m
+2025-11-25T03:46:46.195057Z	 [38;5;246m11 │[0m [38;5;249mi[0m[38;5;249mm[0m[38;5;249mp[0m[38;5;249mo[0m[38;5;249mr[0m[38;5;249mt[0m[38;5;249m [0m[38;5;249m{[0m[38;5;249m [0mmigrateOldProducts[38;5;249m [0m[38;5;249m}[0m[38;5;249m [0m[38;5;249mf[0m[38;5;249mr[0m[38;5;249mo[0m[38;5;249mm[0m[38;5;249m [0m[38;5;249m"[0m[38;5;249m.[0m[38;5;249m/[0m[38;5;249mu[0m[38;5;249mt[0m[38;5;249mi[0m[38;5;249ml[0m[38;5;249ms[0m[38;5;249m/[0m[38;5;249mc[0m[38;5;249mo[0m[38;5;249ml[0m[38;5;249ml[0m[38;5;249me[0m[38;5;249mc[0m[38;5;249mt[0m[38;5;249mi[0m[38;5;249mo[0m[38;5;249mn[0m[38;5;249ms[0m[38;5;249m"[0m[38;5;249m;[0m
+2025-11-25T03:46:46.195287Z	 [38;5;240m   │[0m          ─────────┬────────  
+2025-11-25T03:46:46.195417Z	 [38;5;240m   │[0m                   ╰────────── Missing export
+2025-11-25T03:46:46.19554Z	[38;5;246m────╯[0m
+2025-11-25T03:46:46.195696Z	
+2025-11-25T03:46:46.195806Z	[31m[MISSING_EXPORT] Error:[0m "updateCollection" is not exported by "src/utils/collections.js".
+2025-11-25T03:46:46.195939Z	   [38;5;246m╭[0m[38;5;246m─[0m[38;5;246m[[0m src/pages/Collections.jsx:3:59 [38;5;246m][0m
+2025-11-25T03:46:46.196065Z	   [38;5;246m│[0m
+2025-11-25T03:46:46.196224Z	 [38;5;246m3 │[0m [38;5;249mi[0m[38;5;249mm[0m[38;5;249mp[0m[38;5;249mo[0m[38;5;249mr[0m[38;5;249mt[0m[38;5;249m [0m[38;5;249m{[0m[38;5;249m [0m[38;5;249mg[0m[38;5;249me[0m[38;5;249mt[0m[38;5;249mC[0m[38;5;249mo[0m[38;5;249ml[0m[38;5;249ml[0m[38;5;249me[0m[38;5;249mc[0m[38;5;249mt[0m[38;5;249mi[0m[38;5;249mo[0m[38;5;249mn[0m[38;5;249ms[0m[38;5;249m,[0m[38;5;249m [0m[38;5;249ma[0m[38;5;249md[0m[38;5;249md[0m[38;5;249mC[0m[38;5;249mo[0m[38;5;249ml[0m[38;5;249ml[0m[38;5;249me[0m[38;5;249mc[0m[38;5;249mt[0m[38;5;249mi[0m[38;5;249mo[0m[38;5;249mn[0m[38;5;249m,[0m[38;5;249m [0m[38;5;249md[0m[38;5;249me[0m[38;5;249ml[0m[38;5;249me[0m[38;5;249mt[0m[38;5;249me[0m[38;5;249mC[0m[38;5;249mo[0m[38;5;249ml[0m[38;5;249ml[0m[38;5;249me[0m[38;5;249mc[0m[38;5;249mt[0m[38;5;249mi[0m[38;5;249mo[0m[38;5;249mn[0m[38;5;249m,[0m[38;5;249m [0mupdateCollection[38;5;249m [0m[38;5;249m}[0m[38;5;249m [0m[38;5;249mf[0m[38;5;249mr[0m[38;5;249mo[0m[38;5;249mm[0m[38;5;249m [0m[38;5;249m"[0m[38;5;249m.[0m[38;5;249m.[0m[38;5;249m/[0m[38;5;249mu[0m[38;5;249mt[0m[38;5;249mi[0m[38;5;249ml[0m[38;5;249ms[0m[38;5;249m/[0m[38;5;249mc[0m[38;5;249mo[0m[38;5;249ml[0m[38;5;249ml[0m[38;5;249me[0m[38;5;249mc[0m[38;5;249mt[0m[38;5;249mi[0m[38;5;249mo[0m[38;5;249mn[0m[38;5;249ms[0m[38;5;249m"[0m[38;5;249m;[0m
+2025-11-25T03:46:46.196541Z	 [38;5;240m  │[0m                                                           ────────┬───────  
+2025-11-25T03:46:46.196704Z	 [38;5;240m  │[0m                                                                   ╰───────── Missing export
+2025-11-25T03:46:46.196823Z	[38;5;246m───╯[0m
+2025-11-25T03:46:46.197008Z	
+2025-11-25T03:46:46.197154Z	[31m[MISSING_EXPORT] Error:[0m "getProductFromCollection" is not exported by "src/utils/collections.js".
+2025-11-25T03:46:46.197262Z	   [38;5;246m╭[0m[38;5;246m─[0m[38;5;246m[[0m src/pages/EditCollectionProduct.jsx:3:10 [38;5;246m][0m
+2025-11-25T03:46:46.197401Z	   [38;5;246m│[0m
+2025-11-25T03:46:46.197517Z	 [38;5;246m3 │[0m [38;5;249mi[0m[38;5;249mm[0m[38;5;249mp[0m[38;5;249mo[0m[38;5;249mr[0m[38;5;249mt[0m[38;5;249m [0m[38;5;249m{[0m[38;5;249m [0mgetProductFromCollection[38;5;249m,[0m[38;5;249m [0m[38;5;249mu[0m[38;5;249mp[0m[38;5;249md[0m[38;5;249ma[0m[38;5;249mt[0m[38;5;249me[0m[38;5;249mP[0m[38;5;249mr[0m[38;5;249mo[0m[38;5;249md[0m[38;5;249mu[0m[38;5;249mc[0m[38;5;249mt[0m[38;5;249mI[0m[38;5;249mn[0m[38;5;249mC[0m[38;5;249mo[0m[38;5;249ml[0m[38;5;249ml[0m[38;5;249me[0m[38;5;249mc[0m[38;5;249mt[0m[38;5;249mi[0m[38;5;249mo[0m[38;5;249mn[0m[38;5;249m,[0m[38;5;249m [0m[38;5;249mg[0m[38;5;249me[0m[38;5;249mt[0m[38;5;249mC[0m[38;5;249mo[0m[38;5;249ml[0m[38;5;249ml[0m[38;5;249me[0m[38;5;249mc[0m[38;5;249mt[0m[38;5;249mi[0m[38;5;249mo[0m[38;5;249mn[0m[38;5;249ms[0m[38;5;249m [0m[38;5;249m}[0m[38;5;249m [0m[38;5;249mf[0m[38;5;249mr[0m[38;5;249mo[0m[38;5;249mm[0m[38;5;249m [0m[38;5;249m"[0m[38;5;249m.[0m[38;5;249m.[0m[38;5;249m/[0m[38;5;249mu[0m[38;5;249mt[0m[38;5;249mi[0m[38;5;249ml[0m[38;5;249ms[0m[38;5;249m/[0m[38;5;249mc[0m[38;5;249mo[0m[38;5;249ml[0m[38;5;249ml[0m[38;5;249me[0m[38;5;249mc[0m[38;5;249mt[0m[38;5;249mi[0m[38;5;249mo[0m[38;5;249mn[0m[38;5;249ms[0m[38;5;249m"[0m[38;5;249m;[0m
+2025-11-25T03:46:46.197646Z	 [38;5;240m  │[0m          ────────────┬───────────  
+2025-11-25T03:46:46.197858Z	 [38;5;240m  │[0m                      ╰───────────── Missing export
+2025-11-25T03:46:46.197963Z	[38;5;246m───╯[0m
+2025-11-25T03:46:46.198106Z	
+2025-11-25T03:46:46.19825Z	[31m[MISSING_EXPORT] Error:[0m "incrementClicksInCollection" is not exported by "src/utils/collections.js".
+2025-11-25T03:46:46.198338Z	   [38;5;246m╭[0m[38;5;246m─[0m[38;5;246m[[0m src/components/ProductCard.jsx:2:10 [38;5;246m][0m
+2025-11-25T03:46:46.198544Z	   [38;5;246m│[0m
+2025-11-25T03:46:46.198627Z	 [38;5;246m2 │[0m [38;5;249mi[0m[38;5;249mm[0m[38;5;249mp[0m[38;5;249mo[0m[38;5;249mr[0m[38;5;249mt[0m[38;5;249m [0m[38;5;249m{[0m[38;5;249m [0mincrementClicksInCollection[38;5;249m,[0m[38;5;249m [0m[38;5;249mg[0m[38;5;249me[0m[38;5;249mt[0m[38;5;249mP[0m[38;5;249mr[0m[38;5;249mo[0m[38;5;249md[0m[38;5;249mu[0m[38;5;249mc[0m[38;5;249mt[0m[38;5;249mF[0m[38;5;249mr[0m[38;5;249mo[0m[38;5;249mm[0m[38;5;249mC[0m[38;5;249mo[0m[38;5;249ml[0m[38;5;249ml[0m[38;5;249me[0m[38;5;249mc[0m[38;5;249mt[0m[38;5;249mi[0m[38;5;249mo[0m[38;5;249mn[0m[38;5;249m [0m[38;5;249m}[0m[38;5;249m [0m[38;5;249mf[0m[38;5;249mr[0m[38;5;249mo[0m[38;5;249mm[0m[38;5;249m [0m[38;5;249m"[0m[38;5;249m.[0m[38;5;249m.[0m[38;5;249m/[0m[38;5;249mu[0m[38;5;249mt[0m[38;5;249mi[0m[38;5;249ml[0m[38;5;249ms[0m[38;5;249m/[0m[38;5;249mc[0m[38;5;249mo[0m[38;5;249ml[0m[38;5;249ml[0m[38;5;249me[0m[38;5;249mc[0m[38;5;249mt[0m[38;5;249mi[0m[38;5;249mo[0m[38;5;249mn[0m[38;5;249ms[0m[38;5;249m"[0m[38;5;249m;[0m
+2025-11-25T03:46:46.198785Z	 [38;5;240m  │[0m          ─────────────┬─────────────  
+2025-11-25T03:46:46.198915Z	 [38;5;240m  │[0m                       ╰─────────────── Missing export
+2025-11-25T03:46:46.199092Z	[38;5;246m───╯[0m
+2025-11-25T03:46:46.199177Z	
+2025-11-25T03:46:46.19947Z	[31m[MISSING_EXPORT] Error:[0m "getProductFromCollection" is not exported by "src/utils/collections.js".
+2025-11-25T03:46:46.199649Z	   [38;5;246m╭[0m[38;5;246m─[0m[38;5;246m[[0m src/components/ProductCard.jsx:2:39 [38;5;246m][0m
+2025-11-25T03:46:46.199891Z	   [38;5;246m│[0m
+2025-11-25T03:46:46.200171Z	 [38;5;246m2 │[0m [38;5;249mi[0m[38;5;249mm[0m[38;5;249mp[0m[38;5;249mo[0m[38;5;249mr[0m[38;5;249mt[0m[38;5;249m [0m[38;5;249m{[0m[38;5;249m [0m[38;5;249mi[0m[38;5;249mn[0m[38;5;249mc[0m[38;5;249mr[0m[38;5;249me[0m[38;5;249mm[0m[38;5;249me[0m[38;5;249mn[0m[38;5;249mt[0m[38;5;249mC[0m[38;5;249ml[0m[38;5;249mi[0m[38;5;249mc[0m[38;5;249mk[0m[38;5;249ms[0m[38;5;249mI[0m[38;5;249mn[0m[38;5;249mC[0m[38;5;249mo[0m[38;5;249ml[0m[38;5;249ml[0m[38;5;249me[0m[38;5;249mc[0m[38;5;249mt[0m[38;5;249mi[0m[38;5;249mo[0m[38;5;249mn[0m[38;5;249m,[0m[38;5;249m [0mgetProductFromCollection[38;5;249m [0m[38;5;249m}[0m[38;5;249m [0m[38;5;249mf[0m[38;5;249mr[0m[38;5;249mo[0m[38;5;249mm[0m[38;5;249m [0m[38;5;249m"[0m[38;5;249m.[0m[38;5;249m.[0m[38;5;249m/[0m[38;5;249mu[0m[38;5;249mt[0m[38;5;249mi[0m[38;5;249ml[0m[38;5;249ms[0m[38;5;249m/[0m[38;5;249mc[0m[38;5;249mo[0m[38;5;249ml[0m[38;5;249ml[0m[38;5;249me[0m[38;5;249mc[0m[38;5;249mt[0m[38;5;249mi[0m[38;5;249mo[0m[38;5;249mn[0m[38;5;249ms[0m[38;5;249m"[0m[38;5;249m;[0m
+2025-11-25T03:46:46.200355Z	 [38;5;240m  │[0m                                       ────────────┬───────────  
+2025-11-25T03:46:46.200503Z	 [38;5;240m  │[0m                                                   ╰───────────── Missing export
+2025-11-25T03:46:46.200595Z	[38;5;246m───╯[0m
+2025-11-25T03:46:46.200681Z	[31m
+2025-11-25T03:46:46.200804Z	    at aggregateBindingErrorsIntoJsError (file:///opt/buildhome/repo/node_modules/rolldown/dist/shared/src-CYkh2Ybc.mjs:2659:18)
+2025-11-25T03:46:46.200906Z	    at unwrapBindingResult (file:///opt/buildhome/repo/node_modules/rolldown/dist/shared/src-CYkh2Ybc.mjs:2634:128)
+2025-11-25T03:46:46.201032Z	    at #build (file:///opt/buildhome/repo/node_modules/rolldown/dist/shared/src-CYkh2Ybc.mjs:4433:34)
+2025-11-25T03:46:46.201142Z	    at async buildEnvironment (file:///opt/buildhome/repo/node_modules/vite/dist/node/chunks/node.js:33468:64)
+2025-11-25T03:46:46.201246Z	    at async Object.build (file:///opt/buildhome/repo/node_modules/vite/dist/node/chunks/node.js:33871:19)
+2025-11-25T03:46:46.201345Z	    at async Object.buildApp (file:///opt/buildhome/repo/node_modules/vite/dist/node/chunks/node.js:33868:153)
+2025-11-25T03:46:46.20144Z	    at async CAC.<anonymous> (file:///opt/buildhome/repo/node_modules/vite/dist/node/cli.js:629:3)[39m
+2025-11-25T03:46:46.23682Z	Failed: Error while executing user command. Exited with error code: 1
+2025-11-25T03:46:46.247595Z	Failed: build command exited with code: 1
+2025-11-25T03:46:47.530508Z	Failed: error occurred while running build command
