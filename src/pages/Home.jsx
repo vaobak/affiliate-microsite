@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
-import { incrementPageViews } from '../utils/storage';
+import { trackPageView } from '../utils/storage';
 import { getCollectionBySlug, getDefaultCollection, getCollectionProducts } from '../utils/collections';
 import { trackCollectionView } from '../utils/analytics';
 import ProductCard from '../components/ProductCard';
@@ -10,6 +10,7 @@ export default function Home() {
   const [products, setProducts] = useState([]);
   const [currentRange, setCurrentRange] = useState(0);
   const [collection, setCollection] = useState(null);
+  const [loading, setLoading] = useState(true);
   const hasTrackedView = useRef(false);
   const ITEMS_PER_PAGE = 100;
 
@@ -18,7 +19,7 @@ export default function Home() {
     
     // Track page view only once per mount
     if (!hasTrackedView.current) {
-      incrementPageViews();
+      trackPageView();
       hasTrackedView.current = true;
     }
   }, [collectionSlug]);
@@ -30,25 +31,32 @@ export default function Home() {
     }
   }, [collection]);
 
-  const loadProducts = () => {
-    // Get collection info
-    let currentCollection;
-    if (collectionSlug) {
-      currentCollection = getCollectionBySlug(collectionSlug);
-      if (!currentCollection) {
-        // Collection not found, use default
-        currentCollection = getDefaultCollection();
+  const loadProducts = async () => {
+    try {
+      setLoading(true);
+      // Get collection info
+      let currentCollection;
+      if (collectionSlug) {
+        currentCollection = await getCollectionBySlug(collectionSlug);
+        if (!currentCollection) {
+          // Collection not found, use default
+          currentCollection = await getDefaultCollection();
+        }
+      } else {
+        currentCollection = await getDefaultCollection();
       }
-    } else {
-      currentCollection = getDefaultCollection();
-    }
-    setCollection(currentCollection);
+      setCollection(currentCollection);
 
-    // Get products from this collection
-    const items = getCollectionProducts(currentCollection.id);
-    // Sort ascending by ID (1, 2, 3, ...)
-    const sortedAsc = items.sort((a, b) => a.id - b.id);
-    setProducts(sortedAsc);
+      // Get products from this collection
+      const items = await getCollectionProducts(currentCollection.id);
+      // Sort ascending by ID (1, 2, 3, ...)
+      const sortedAsc = items.sort((a, b) => a.id - b.id);
+      setProducts(sortedAsc);
+    } catch (error) {
+      console.error('Error loading products:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   // Pagination calculations
@@ -89,7 +97,12 @@ export default function Home() {
 
       {/* Content */}
       <main className="max-w-4xl mx-auto px-4 py-12">
-        {products.length === 0 ? (
+        {loading ? (
+          <div className="text-center py-20">
+            <div className="w-16 h-16 mx-auto mb-4 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+            <p className="text-gray-600">Loading products...</p>
+          </div>
+        ) : products.length === 0 ? (
           <div className="text-center py-20">
             <div className="w-24 h-24 mx-auto mb-6 bg-gray-100 rounded-full flex items-center justify-center">
               <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">

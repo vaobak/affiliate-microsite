@@ -5,5 +5,5 @@ pages_build_output_dir = "dist"
 [[d1_databases]]
 binding = "DB"
 database_name = "affiliate-db"
-database_id = "YOUR_DATABASE_ID_HERE"
+database_id = "bc30e18a-00c8-4e49-a427-288d9ed901fd"
 # You'll get this ID after creating the database with: wrangler d1 create affiliate-db

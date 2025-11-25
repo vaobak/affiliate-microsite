@@ -1,44 +1,16 @@
-// Analytics utility functions
+// Analytics utility - Now using Cloudflare D1 API with localStorage fallback
 
-const CLICK_HISTORY_KEY = 'affiliate_click_history';
-const COLLECTION_VIEWS_KEY = 'affiliate_collection_views';
-
-// Get click history for charts
-export function getClickHistory(timeRange = 'week') {
-  const stored = localStorage.getItem(CLICK_HISTORY_KEY);
-  if (!stored) return [];
-  
-  try {
-    return JSON.parse(stored);
-  } catch {
-    return [];
-  }
-}
-
-// Save click event
-export function trackClick(productId, collectionId) {
-  const history = getClickHistory();
-  const now = new Date();
-  
-  history.push({
-    productId,
-    collectionId,
-    timestamp: now.toISOString(),
-    date: now.toISOString().split('T')[0],
-    hour: now.getHours()
-  });
-  
-  // Keep only last 1000 clicks
-  if (history.length > 1000) {
-    history.shift();
-  }
-  
-  localStorage.setItem(CLICK_HISTORY_KEY, JSON.stringify(history));
-}
+export {
+  trackClick,
+  trackCollectionView,
+  getClickHistory,
+  getCollectionViews
+} from './db';
 
 // Get aggregated clicks by date
-export function getClicksByDate(days = 7) {
-  const history = getClickHistory();
+export async function getClicksByDate(days = 7) {
+  const { getClickHistory } = await import('./db');
+  const history = await getClickHistory();
   const result = {};
   
   const now = new Date();
@@ -59,8 +31,9 @@ export function getClicksByDate(days = 7) {
 }
 
 // Get clicks by hour (last 24 hours)
-export function getClicksByHour() {
-  const history = getClickHistory();
+export async function getClicksByHour() {
+  const { getClickHistory } = await import('./db');
+  const history = await getClickHistory();
   const result = {};
   
   for (let i = 0; i < 24; i++) {
@@ -80,63 +53,38 @@ export function getClicksByHour() {
   return result;
 }
 
-// Collection Views Tracking
-export function trackCollectionView(collectionId) {
-  const views = getCollectionViews();
-  const now = new Date();
-  
-  views.push({
-    collectionId,
-    timestamp: now.toISOString(),
-    date: now.toISOString().split('T')[0]
-  });
-  
-  // Keep only last 2000 views
-  if (views.length > 2000) {
-    views.shift();
-  }
-  
-  localStorage.setItem(COLLECTION_VIEWS_KEY, JSON.stringify(views));
+// Get collection view count
+export async function getCollectionViewCount(collectionId) {
+  const { getCollectionViews } = await import('./db');
+  const views = await getCollectionViews();
+  return views.filter(view => view.collectionId === collectionId || view.collection_id === collectionId).length;
 }
 
-export function getCollectionViews() {
-  const stored = localStorage.getItem(COLLECTION_VIEWS_KEY);
-  if (!stored) return [];
-  
-  try {
-    return JSON.parse(stored);
-  } catch {
-    return [];
-  }
-}
-
-export function getCollectionViewCount(collectionId) {
-  const views = getCollectionViews();
-  return views.filter(view => view.collectionId === collectionId).length;
-}
-
-export function getCollectionViewsByPeriod(collectionId, days = 7) {
-  const views = getCollectionViews();
+// Get collection views by period
+export async function getCollectionViewsByPeriod(collectionId, days = 7) {
+  const { getCollectionViews } = await import('./db');
+  const views = await getCollectionViews();
   const cutoffDate = new Date();
   cutoffDate.setDate(cutoffDate.getDate() - days);
   
   return views.filter(view => {
     const viewDate = new Date(view.timestamp);
-    return view.collectionId === collectionId && viewDate >= cutoffDate;
+    const matchId = view.collectionId === collectionId || view.collection_id === collectionId;
+    return matchId && viewDate >= cutoffDate;
   }).length;
 }
 
-// Cleanup analytics data when collection is deleted
-export function cleanupCollectionData(collectionId) {
-  // Remove click history for this collection
-  const clickHistory = getClickHistory();
-  const filteredClicks = clickHistory.filter(click => click.collectionId !== collectionId);
-  localStorage.setItem(CLICK_HISTORY_KEY, JSON.stringify(filteredClicks));
+// Cleanup functions
+export async function cleanupCollectionData(collectionId) {
+  // D1 handles this with CASCADE DELETE
+  // For localStorage fallback:
+  const clickHistory = JSON.parse(localStorage.getItem('affiliate_click_history') || '[]');
+  const filteredClicks = clickHistory.filter(click => click.collectionId !== collectionId && click.collection_id !== collectionId);
+  localStorage.setItem('affiliate_click_history', JSON.stringify(filteredClicks));
   
-  // Remove collection views for this collection
-  const collectionViews = getCollectionViews();
-  const filteredViews = collectionViews.filter(view => view.collectionId !== collectionId);
-  localStorage.setItem(COLLECTION_VIEWS_KEY, JSON.stringify(filteredViews));
+  const collectionViews = JSON.parse(localStorage.getItem('affiliate_collection_views') || '[]');
+  const filteredViews = collectionViews.filter(view => view.collectionId !== collectionId && view.collection_id !== collectionId);
+  localStorage.setItem('affiliate_collection_views', JSON.stringify(filteredViews));
   
   return {
     clicksRemoved: clickHistory.length - filteredClicks.length,
@@ -144,13 +92,8 @@ export function cleanupCollectionData(collectionId) {
   };
 }
 
-// Reset all analytics data
 export function resetAllAnalytics() {
-  // Clear click history
-  localStorage.setItem(CLICK_HISTORY_KEY, JSON.stringify([]));
-  
-  // Clear collection views
-  localStorage.setItem(COLLECTION_VIEWS_KEY, JSON.stringify([]));
-  
+  localStorage.setItem('affiliate_click_history', JSON.stringify([]));
+  localStorage.setItem('affiliate_collection_views', JSON.stringify([]));
   return true;
 }
