@@ -145,12 +145,72 @@ export async function incrementClicksInCollection(collectionId, productId) {
 }
 
 // Import/Export functions
-export function importProductsReplaceToCollection(collectionId, products) {
-  return products;
+export async function importProductsReplaceToCollection(collectionId, products) {
+  try {
+    // Delete all existing products in this collection
+    const existingProducts = await api.fetchProducts(collectionId);
+    for (const product of existingProducts) {
+      await api.deleteProduct(product.id);
+    }
+    
+    // Add all new products
+    let imported = 0;
+    for (const product of products) {
+      await api.createProduct({
+        collectionId: collectionId,
+        name: product.Name || product.name,
+        description: product.Description || product.description || '',
+        price: parseFloat(product.Price || product.price || 0),
+        affiliateLink: product['Affiliate Link'] || product.affiliateLink || product.affiliate_link || '',
+        imageUrl: product['Image URL'] || product.imageUrl || product.image_url || '',
+        category: product.Category || product.category || '',
+        badge: product.Badge || product.badge || ''
+      });
+      imported++;
+    }
+    
+    // Get updated products count
+    const updatedProducts = await api.fetchProducts(collectionId);
+    
+    return {
+      imported: imported,
+      total: updatedProducts.length
+    };
+  } catch (error) {
+    console.error('Error importing products (replace):', error);
+    throw new Error('Failed to import products: ' + error.message);
+  }
 }
 
-export function importProductsNewToCollection(collectionId, products) {
-  return products;
+export async function importProductsNewToCollection(collectionId, products) {
+  try {
+    // Add new products without deleting existing ones
+    let imported = 0;
+    for (const product of products) {
+      await api.createProduct({
+        collectionId: collectionId,
+        name: product.Name || product.name,
+        description: product.Description || product.description || '',
+        price: parseFloat(product.Price || product.price || 0),
+        affiliateLink: product['Affiliate Link'] || product.affiliateLink || product.affiliate_link || '',
+        imageUrl: product['Image URL'] || product.imageUrl || product.image_url || '',
+        category: product.Category || product.category || '',
+        badge: product.Badge || product.badge || ''
+      });
+      imported++;
+    }
+    
+    // Get updated products count
+    const updatedProducts = await api.fetchProducts(collectionId);
+    
+    return {
+      imported: imported,
+      total: updatedProducts.length
+    };
+  } catch (error) {
+    console.error('Error importing products (new):', error);
+    throw new Error('Failed to import products: ' + error.message);
+  }
 }
 
 // Export products to Excel
