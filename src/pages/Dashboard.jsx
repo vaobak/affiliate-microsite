@@ -1037,7 +1037,7 @@ export default function Dashboard() {
               <h3 className="text-lg font-bold text-gray-800 dark:text-gray-200 mb-4">CTR by Collection</h3>
               <div className="space-y-4">
                 {collections.map(col => {
-                  const products = getCollectionProducts(col.id);
+                  const products = Array.isArray(col.products) ? col.products : [];
                   const totalClicks = products.reduce((sum, p) => sum + (p.clicks || 0), 0);
                   const ctr = products.length > 0 ? ((totalClicks / products.length) * 100).toFixed(1) : 0;
                   const percentage = stats.totalClicks > 0 ? (totalClicks / stats.totalClicks) * 100 : 0;
