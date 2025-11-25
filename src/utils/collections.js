@@ -155,26 +155,47 @@ export async function importProductsReplaceToCollection(collectionId, products) 
     
     // Add all new products
     let imported = 0;
+    let errors = [];
+    
     for (const product of products) {
-      await api.createProduct({
-        collectionId: collectionId,
-        name: product.Name || product.name,
-        description: product.Description || product.description || '',
-        price: parseFloat(product.Price || product.price || 0),
-        affiliateLink: product['Affiliate Link'] || product.affiliateLink || product.affiliate_link || '',
-        imageUrl: product['Image URL'] || product.imageUrl || product.image_url || '',
-        category: product.Category || product.category || '',
-        badge: product.Badge || product.badge || ''
-      });
-      imported++;
+      try {
+        // Support multiple column name formats
+        const name = product['Product Name'] || product.Name || product.name;
+        const affiliateLink = product['Affiliate Link'] || product.affiliateLink || product.affiliate_link;
+        
+        // Skip if no name or affiliate link
+        if (!name || !affiliateLink) {
+          errors.push(`Skipped product: missing name or affiliate link (Name: "${name || 'empty'}", Link: "${affiliateLink || 'empty'}")`);
+          continue;
+        }
+        
+        await api.createProduct({
+          collectionId: collectionId,
+          name: name,
+          description: product.Description || product.description || '',
+          price: parseFloat(product.Price || product.price || 0),
+          affiliateLink: affiliateLink,
+          imageUrl: product['Image URL'] || product.imageUrl || product.image_url || '',
+          category: product.Category || product.category || 'Uncategorized',
+          badge: product.Badge || product.badge || ''
+        });
+        imported++;
+      } catch (err) {
+        errors.push(`Error importing product "${product['Product Name'] || product.Name || product.name}": ${err.message}`);
+      }
     }
     
     // Get updated products count
     const updatedProducts = await api.fetchProducts(collectionId);
     
+    if (errors.length > 0) {
+      console.warn('Import warnings:', errors);
+    }
+    
     return {
       imported: imported,
-      total: updatedProducts.length
+      total: updatedProducts.length,
+      errors: errors.length > 0 ? errors : undefined
     };
   } catch (error) {
     console.error('Error importing products (replace):', error);
@@ -186,26 +207,47 @@ export async function importProductsNewToCollection(collectionId, products) {
   try {
     // Add new products without deleting existing ones
     let imported = 0;
+    let errors = [];
+    
     for (const product of products) {
-      await api.createProduct({
-        collectionId: collectionId,
-        name: product.Name || product.name,
-        description: product.Description || product.description || '',
-        price: parseFloat(product.Price || product.price || 0),
-        affiliateLink: product['Affiliate Link'] || product.affiliateLink || product.affiliate_link || '',
-        imageUrl: product['Image URL'] || product.imageUrl || product.image_url || '',
-        category: product.Category || product.category || '',
-        badge: product.Badge || product.badge || ''
-      });
-      imported++;
+      try {
+        // Support multiple column name formats
+        const name = product['Product Name'] || product.Name || product.name;
+        const affiliateLink = product['Affiliate Link'] || product.affiliateLink || product.affiliate_link;
+        
+        // Skip if no name or affiliate link
+        if (!name || !affiliateLink) {
+          errors.push(`Skipped product: missing name or affiliate link (Name: "${name || 'empty'}", Link: "${affiliateLink || 'empty'}")`);
+          continue;
+        }
+        
+        await api.createProduct({
+          collectionId: collectionId,
+          name: name,
+          description: product.Description || product.description || '',
+          price: parseFloat(product.Price || product.price || 0),
+          affiliateLink: affiliateLink,
+          imageUrl: product['Image URL'] || product.imageUrl || product.image_url || '',
+          category: product.Category || product.category || 'Uncategorized',
+          badge: product.Badge || product.badge || ''
+        });
+        imported++;
+      } catch (err) {
+        errors.push(`Error importing product "${product['Product Name'] || product.Name || product.name}": ${err.message}`);
+      }
     }
     
     // Get updated products count
     const updatedProducts = await api.fetchProducts(collectionId);
     
+    if (errors.length > 0) {
+      console.warn('Import warnings:', errors);
+    }
+    
     return {
       imported: imported,
-      total: updatedProducts.length
+      total: updatedProducts.length,
+      errors: errors.length > 0 ? errors : undefined
     };
   } catch (error) {
     console.error('Error importing products (new):', error);
