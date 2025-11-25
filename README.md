@@ -281,8 +281,30 @@ Made with ❤️ using React + Vite + Tailwind CSS + Cloudflare D1
 3. ✅ **Cross-Device Sync** - Setting sama di semua device
 
 **Documentation:**
+
+### **📚 Main Guides:**
+- `FINAL_DEPLOYMENT_V2.3.2.md` - **Complete deployment guide**
+- `CHANGELOG_V2.3.2.md` - **Version history & changes**
+- `README.md` - This file
+
+### **🔧 Feature Documentation:**
 - `AUTO_RENUMBER_FIX.md` - Auto-renumber sequential IDs (v2.3.2)
 - `TYPOGRAPHY_AND_ID_FIX.md` - Typography & ID fixes (v2.3.1)
 - `SIMPLE_LAYOUT_UPDATE.md` - Simple layout changes (v2.3)
-- `PREFERENCES_SYNC_MIGRATION.md` - Cross-device sync migration
-- `BUG_FIXES_IMPROVEMENTS.md` - Bug fixes & improvements
+- `LINKTREE_FEATURES_COMPLETE.md` - Linktree-style features (v2.0)
+- `DESIGN_SYSTEM.md` - Design system reference
+
+### **🚀 Deployment Guides:**
+- `RENUMBER_DEPLOYMENT_GUIDE.md` - Renumber feature deployment
+- `DEPLOY_V2.2.md` - Preferences sync deployment
+- `DEPLOYMENT_FLOW.md` - General deployment flow
+
+### **🔄 Migration Guides:**
+- `PREFERENCES_SYNC_MIGRATION.md` - User preferences migration
+- `UPDATE_TO_D1.md` - D1 database migration
+- `migration-add-user-preferences.sql` - SQL migration
+
+### **🐛 Bug Fixes:**
+- `BUG_FIXES_IMPROVEMENTS.md` - All bug fixes & improvements
+- `FIX_DASHBOARD_BLANK.md` - Dashboard fixes
+- `FIX_BUILD_ERROR.md` - Build error fixes
