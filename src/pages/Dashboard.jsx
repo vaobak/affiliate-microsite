@@ -30,6 +30,7 @@ export default function Dashboard() {
   const [chartData, setChartData] = useState([]);
   const [collectionPerformance, setCollectionPerformance] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
   const ITEMS_PER_PAGE = 50;
   const clicksPerformanceRef = useRef(null);
@@ -38,19 +39,51 @@ export default function Dashboard() {
   const submenuTimeoutRef = useRef(null);
 
   useEffect(() => {
-    setLoading(true);
-    Promise.all([
-      loadStats(),
-      loadTopProducts()
-    ]).then(() => {
+    loadAllData();
+  }, []);
+
+  const loadAllData = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      // Load main data
+      await loadStats();
+      await loadTopProducts();
       loadRecentActivity();
       loadUnreadCount();
+      
+      // Load chart data
+      await loadChartData();
+      await loadCollectionPerformanceData();
+      
       setLoading(false);
-    }).catch(error => {
-      console.error('Error loading dashboard:', error);
+    } catch (err) {
+      console.error('Error loading dashboard:', err);
+      setError(err.message || 'Failed to load dashboard data');
       setLoading(false);
-    });
-  }, []);
+    }
+  };
+
+  const loadChartData = async () => {
+    try {
+      const data = await getChartData();
+      setChartData(data);
+    } catch (error) {
+      console.error('Error loading chart data:', error);
+      setChartData([]);
+    }
+  };
+
+  const loadCollectionPerformanceData = async () => {
+    try {
+      const data = await getCollectionPerformance();
+      setCollectionPerformance(data);
+    } catch (error) {
+      console.error('Error loading collection performance:', error);
+      setCollectionPerformance([]);
+    }
+  };
 
   const loadUnreadCount = () => {
     setUnreadCount(getUnreadCount());
@@ -341,6 +374,47 @@ export default function Dashboard() {
         );
     }
   };
+
+  // Loading state
+  if (loading) {
+    return (
+      <div className="flex min-h-screen bg-gray-50 dark:bg-gray-900">
+        <Sidebar productCount={0} />
+        <main className="flex-1 flex items-center justify-center">
+          <div className="text-center">
+            <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <p className="text-gray-600 dark:text-gray-400">Loading dashboard...</p>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div className="flex min-h-screen bg-gray-50 dark:bg-gray-900">
+        <Sidebar productCount={0} />
+        <main className="flex-1 flex items-center justify-center">
+          <div className="text-center max-w-md">
+            <div className="w-16 h-16 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-8 h-8 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <h2 className="text-xl font-bold text-gray-800 dark:text-gray-200 mb-2">Error Loading Dashboard</h2>
+            <p className="text-gray-600 dark:text-gray-400 mb-4">{error}</p>
+            <button
+              onClick={loadAllData}
+              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+            >
+              Retry
+            </button>
+          </div>
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -701,7 +775,7 @@ export default function Dashboard() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                    {getCollectionPerformance().map((collection) => (
+                    {collectionPerformance.map((collection) => (
                       <tr key={collection.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
                         <td className="py-3">
                           <p className="font-medium text-gray-800 dark:text-gray-200">{collection.name}</p>
@@ -848,8 +922,8 @@ export default function Dashboard() {
 
             {/* Simple Bar Chart */}
             <div className="h-64 flex items-end justify-between gap-2">
-              {getChartData().map((data, index) => {
-                const maxValue = Math.max(...getChartData().map(d => d.value));
+              {chartData.map((data, index) => {
+                const maxValue = Math.max(...chartData.map(d => d.value), 1);
                 return (
                   <div key={index} className="flex-1 flex flex-col items-center gap-2">
                     <div className="w-full bg-gray-100 dark:bg-gray-700 rounded-t-lg relative group">
