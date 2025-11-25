@@ -4,6 +4,7 @@ import { trackPageView } from '../utils/storage';
 import { getCollectionBySlug, getDefaultCollection, getCollectionProducts } from '../utils/collections';
 import { trackCollectionView } from '../utils/analytics';
 import ProductCard from '../components/ProductCard';
+import { getTheme } from '../utils/themes';
 
 export default function Home() {
   const { collection: collectionSlug } = useParams();
@@ -81,12 +82,14 @@ export default function Home() {
     return buttons;
   };
 
+  const theme = getTheme(collection?.theme || 'blue');
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+    <div className={`min-h-screen bg-gradient-to-br ${theme.bg} via-white to-gray-50`}>
       {/* Header */}
-      <header className="bg-white shadow-sm border-b border-gray-100">
+      <header className={`bg-white shadow-sm border-b-4 ${theme.border}`}>
         <div className="max-w-6xl mx-auto px-4 py-6">
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+          <h1 className={`text-3xl font-bold bg-gradient-to-r ${theme.gradient} bg-clip-text text-transparent`}>
             {collection?.name || 'Produk Pilihan'}
           </h1>
           <p className="text-gray-600 mt-2">
@@ -130,8 +133,8 @@ export default function Home() {
                         onClick={() => goToRange(btn.index)}
                         className={`px-4 py-2 rounded-lg font-medium text-sm transition-all ${
                           currentRange === btn.index
-                            ? 'bg-blue-600 text-white shadow-md'
-                            : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 hover:border-blue-400'
+                            ? `bg-gradient-to-r ${theme.gradient} text-white shadow-md`
+                            : `bg-white ${theme.text} border ${theme.border} ${theme.hover}`
                         }`}
                       >
                         {btn.start}-{btn.end}
