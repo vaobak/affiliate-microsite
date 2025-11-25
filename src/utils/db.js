@@ -7,14 +7,21 @@ const USE_API = import.meta.env.PROD || window.location.hostname !== 'localhost'
 
 // Test if API is available
 let apiAvailable = false;
+let apiTested = false;
 
 async function testAPI() {
-  if (!USE_API) return false;
+  if (apiTested) return apiAvailable;
+  apiTested = true;
+  
+  if (!USE_API) {
+    apiAvailable = false;
+    return false;
+  }
   
   try {
-    await fetch('/api/collections', { method: 'HEAD' });
-    apiAvailable = true;
-    return true;
+    const response = await fetch('/api/collections', { method: 'HEAD' });
+    apiAvailable = response.ok;
+    return apiAvailable;
   } catch {
     apiAvailable = false;
     return false;
@@ -24,29 +31,38 @@ async function testAPI() {
 // Initialize API check
 testAPI();
 
-// Collections
-export async function getCollections() {
-  if (apiAvailable) {
-    try {
-      return await api.fetchCollections();
-    } catch (error) {
-      console.warn('API failed, using localStorage:', error);
-    }
-  }
-  
-  // localStorage fallback
+// Default collections
+const DEFAULT_COLLECTIONS = [
+  { id: 'home', name: 'Halaman Utama', slug: '', description: 'Produk di halaman utama', isDefault: true, products: [] },
+  { id: 'barangviral', name: 'Barang Viral', slug: 'barangviral', description: 'Produk yang sedang viral dan trending', products: [] },
+  { id: 'listprodukeren', name: 'List Produk Keren', slug: 'listprodukeren', description: 'Kumpulan produk keren pilihan', products: [] },
+  { id: 'promo', name: 'Promo', slug: 'promo', description: 'Produk dengan promo spesial', products: [] }
+];
+
+// Sync version for backward compatibility
+function getCollectionsSync() {
   const stored = localStorage.getItem('affiliate_collections');
   if (!stored) {
-    const defaults = [
-      { id: 'home', name: 'Halaman Utama', slug: '', description: 'Produk di halaman utama', isDefault: true, products: [] },
-      { id: 'barangviral', name: 'Barang Viral', slug: 'barangviral', description: 'Produk yang sedang viral dan trending', products: [] },
-      { id: 'listprodukeren', name: 'List Produk Keren', slug: 'listprodukeren', description: 'Kumpulan produk keren pilihan', products: [] },
-      { id: 'promo', name: 'Promo', slug: 'promo', description: 'Produk dengan promo spesial', products: [] }
-    ];
-    localStorage.setItem('affiliate_collections', JSON.stringify(defaults));
-    return defaults;
+    localStorage.setItem('affiliate_collections', JSON.stringify(DEFAULT_COLLECTIONS));
+    return DEFAULT_COLLECTIONS;
   }
   return JSON.parse(stored);
+}
+
+// Collections - Returns Promise for async, but can be used sync via .then()
+export function getCollections() {
+  // If API not tested yet or not available, return sync data wrapped in Promise
+  if (!apiTested || !apiAvailable) {
+    return Promise.resolve(getCollectionsSync());
+  }
+  
+  // Try API first
+  return api.fetchCollections()
+    .catch(error => {
+      console.warn('API failed, using localStorage:', error);
+      apiAvailable = false;
+      return getCollectionsSync();
+    });
 }
 
 export async function saveCollections(collections) {

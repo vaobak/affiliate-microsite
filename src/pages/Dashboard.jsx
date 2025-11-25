@@ -27,6 +27,9 @@ export default function Dashboard() {
   const [showAddProductMenu, setShowAddProductMenu] = useState(false);
   const [showImportMenu, setShowImportMenu] = useState(false);
   const [hoveredCollection, setHoveredCollection] = useState(null);
+  const [chartData, setChartData] = useState([]);
+  const [collectionPerformance, setCollectionPerformance] = useState([]);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const ITEMS_PER_PAGE = 50;
   const clicksPerformanceRef = useRef(null);
@@ -35,43 +38,55 @@ export default function Dashboard() {
   const submenuTimeoutRef = useRef(null);
 
   useEffect(() => {
-    loadStats();
-    loadRecentActivity();
-    loadTopProducts();
-    loadUnreadCount();
+    setLoading(true);
+    Promise.all([
+      loadStats(),
+      loadTopProducts()
+    ]).then(() => {
+      loadRecentActivity();
+      loadUnreadCount();
+      setLoading(false);
+    }).catch(error => {
+      console.error('Error loading dashboard:', error);
+      setLoading(false);
+    });
   }, []);
 
   const loadUnreadCount = () => {
     setUnreadCount(getUnreadCount());
   };
 
-  const loadStats = () => {
-    const cols = getCollections();
-    setCollections(cols);
-    const pageViews = getPageViews();
-    
-    // Calculate total products and clicks from all collections
-    let totalProducts = 0;
-    let totalClicks = 0;
-    
-    cols.forEach(collection => {
-      if (collection.products && Array.isArray(collection.products)) {
-        totalProducts += collection.products.length;
-        collection.products.forEach(product => {
-          totalClicks += (product.clicks || 0);
-        });
-      }
-    });
+  const loadStats = async () => {
+    try {
+      const cols = await getCollections();
+      setCollections(cols);
+      const pageViews = await getPageViews();
+      
+      // Calculate total products and clicks from all collections
+      let totalProducts = 0;
+      let totalClicks = 0;
+      
+      cols.forEach(collection => {
+        if (collection.products && Array.isArray(collection.products)) {
+          totalProducts += collection.products.length;
+          collection.products.forEach(product => {
+            totalClicks += (product.clicks || 0);
+          });
+        }
+      });
 
-    // Calculate average CTR
-    const avgCTR = totalProducts > 0 ? ((totalClicks / totalProducts) * 100).toFixed(2) : 0;
-    
-    setStats({
-      totalProducts: totalProducts,
-      totalClicks: totalClicks,
-      avgCTR: avgCTR,
-      pageViews: pageViews
-    });
+      // Calculate average CTR
+      const avgCTR = totalProducts > 0 ? ((totalClicks / totalProducts) * 100).toFixed(2) : 0;
+      
+      setStats({
+        totalProducts: totalProducts,
+        totalClicks: totalClicks,
+        avgCTR: avgCTR,
+        pageViews: pageViews
+      });
+    } catch (error) {
+      console.error('Error loading stats:', error);
+    }
   };
 
   const loadRecentActivity = () => {
@@ -79,29 +94,33 @@ export default function Dashboard() {
     setRecentActivity(activities.slice(0, 10));
   };
 
-  const loadTopProducts = () => {
-    const collections = getCollections();
-    
-    // Collect all products from all collections
-    let allProducts = [];
-    collections.forEach(collection => {
-      if (collection.products && Array.isArray(collection.products)) {
-        collection.products.forEach(product => {
-          allProducts.push({
-            ...product,
-            collectionName: collection.name
+  const loadTopProducts = async () => {
+    try {
+      const collections = await getCollections();
+      
+      // Collect all products from all collections
+      let allProducts = [];
+      collections.forEach(collection => {
+        if (collection.products && Array.isArray(collection.products)) {
+          collection.products.forEach(product => {
+            allProducts.push({
+              ...product,
+              collectionName: collection.name
+            });
           });
-        });
-      }
-    });
-    
-    // Sort by clicks and get top 10
-    const sorted = allProducts.sort((a, b) => (b.clicks || 0) - (a.clicks || 0));
-    setTopProducts(sorted.slice(0, 10));
+        }
+      });
+      
+      // Sort by clicks and get top 10
+      const sorted = allProducts.sort((a, b) => (b.clicks || 0) - (a.clicks || 0));
+      setTopProducts(sorted.slice(0, 10));
+    } catch (error) {
+      console.error('Error loading top products:', error);
+    }
   };
 
-  const getChartData = () => {
-    const clickHistory = getClickHistory();
+  const getChartData = async () => {
+    const clickHistory = await getClickHistory();
     const now = new Date();
     
     if (timeRange === 'day') {
@@ -215,8 +234,8 @@ export default function Dashboard() {
   };
 
   // Get collection performance data with real growth calculation
-  const getCollectionPerformance = () => {
-    const clickHistory = getClickHistory();
+  const getCollectionPerformance = async () => {
+    const clickHistory = await getClickHistory();
     const now = new Date();
     const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
     const fourteenDaysAgo = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000);
