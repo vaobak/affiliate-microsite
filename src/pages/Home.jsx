@@ -31,24 +31,24 @@ export default function Home() {
     }
   }, [collection]);
 
-  const loadProducts = () => {
-    setLoading(true);
+  const loadProducts = async () => {
     try {
+      setLoading(true);
       // Get collection info
       let currentCollection;
       if (collectionSlug) {
-        currentCollection = getCollectionBySlug(collectionSlug);
+        currentCollection = await getCollectionBySlug(collectionSlug);
         if (!currentCollection) {
           // Collection not found, use default
-          currentCollection = getDefaultCollection();
+          currentCollection = await getDefaultCollection();
         }
       } else {
-        currentCollection = getDefaultCollection();
+        currentCollection = await getDefaultCollection();
       }
       setCollection(currentCollection);
 
       // Get products from this collection
-      const items = getCollectionProducts(currentCollection.id);
+      const items = await getCollectionProducts(currentCollection.id);
       // Sort ascending by ID (1, 2, 3, ...)
       const sortedAsc = items.sort((a, b) => a.id - b.id);
       setProducts(sortedAsc);

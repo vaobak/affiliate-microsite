@@ -1,17 +1,16 @@
-// Analytics utility - Using D1 with synchronous interface
+// Analytics utility - Now using Cloudflare D1 API with localStorage fallback
 
 export {
   trackClick,
   trackCollectionView,
   getClickHistory,
-  getCollectionViews,
-  getCollectionViewCount
-} from './db-sync';
+  getCollectionViews
+} from './db';
 
 // Get aggregated clicks by date
-export function getClicksByDate(days = 7) {
-  const { getClickHistory } = require('./db-sync');
-  const history = getClickHistory();
+export async function getClicksByDate(days = 7) {
+  const { getClickHistory } = await import('./db');
+  const history = await getClickHistory();
   const result = {};
   
   const now = new Date();
@@ -24,17 +23,17 @@ export function getClicksByDate(days = 7) {
   
   history.forEach(click => {
     if (result.hasOwnProperty(click.date)) {
-      result[dateStr]++;
+      result[click.date]++;
     }
   });
   
   return result;
 }
 
-// Get clicks by hour
-export function getClicksByHour() {
-  const { getClickHistory } = require('./db-sync');
-  const history = getClickHistory();
+// Get clicks by hour (last 24 hours)
+export async function getClicksByHour() {
+  const { getClickHistory } = await import('./db');
+  const history = await getClickHistory();
   const result = {};
   
   for (let i = 0; i < 24; i++) {
@@ -54,10 +53,17 @@ export function getClicksByHour() {
   return result;
 }
 
+// Get collection view count
+export async function getCollectionViewCount(collectionId) {
+  const { getCollectionViews } = await import('./db');
+  const views = await getCollectionViews();
+  return views.filter(view => view.collectionId === collectionId || view.collection_id === collectionId).length;
+}
+
 // Get collection views by period
-export function getCollectionViewsByPeriod(collectionId, days = 7) {
-  const { getCollectionViews } = require('./db-sync');
-  const views = getCollectionViews();
+export async function getCollectionViewsByPeriod(collectionId, days = 7) {
+  const { getCollectionViews } = await import('./db');
+  const views = await getCollectionViews();
   const cutoffDate = new Date();
   cutoffDate.setDate(cutoffDate.getDate() - days);
   
@@ -69,7 +75,9 @@ export function getCollectionViewsByPeriod(collectionId, days = 7) {
 }
 
 // Cleanup functions
-export function cleanupCollectionData(collectionId) {
+export async function cleanupCollectionData(collectionId) {
+  // D1 handles this with CASCADE DELETE
+  // For localStorage fallback:
   const clickHistory = JSON.parse(localStorage.getItem('affiliate_click_history') || '[]');
   const filteredClicks = clickHistory.filter(click => click.collectionId !== collectionId && click.collection_id !== collectionId);
   localStorage.setItem('affiliate_click_history', JSON.stringify(filteredClicks));

@@ -39,27 +39,28 @@ export default function Dashboard() {
 
   useEffect(() => {
     setLoading(true);
-    try {
-      loadStats();
+    Promise.all([
+      loadStats(),
+      loadTopProducts()
+    ]).then(() => {
       loadRecentActivity();
-      loadTopProducts();
       loadUnreadCount();
-    } catch (error) {
-      console.error('Error loading dashboard:', error);
-    } finally {
       setLoading(false);
-    }
+    }).catch(error => {
+      console.error('Error loading dashboard:', error);
+      setLoading(false);
+    });
   }, []);
 
   const loadUnreadCount = () => {
     setUnreadCount(getUnreadCount());
   };
 
-  const loadStats = () => {
+  const loadStats = async () => {
     try {
-      const cols = getCollections();
+      const cols = await getCollections();
       setCollections(cols);
-      const pageViews = getPageViews();
+      const pageViews = await getPageViews();
       
       // Calculate total products and clicks from all collections
       let totalProducts = 0;
@@ -93,9 +94,9 @@ export default function Dashboard() {
     setRecentActivity(activities.slice(0, 10));
   };
 
-  const loadTopProducts = () => {
+  const loadTopProducts = async () => {
     try {
-      const collections = getCollections();
+      const collections = await getCollections();
       
       // Collect all products from all collections
       let allProducts = [];
@@ -118,8 +119,8 @@ export default function Dashboard() {
     }
   };
 
-  const getChartData = () => {
-    const clickHistory = getClickHistory();
+  const getChartData = async () => {
+    const clickHistory = await getClickHistory();
     const now = new Date();
     
     if (timeRange === 'day') {
@@ -233,8 +234,8 @@ export default function Dashboard() {
   };
 
   // Get collection performance data with real growth calculation
-  const getCollectionPerformance = () => {
-    const clickHistory = getClickHistory();
+  const getCollectionPerformance = async () => {
+    const clickHistory = await getClickHistory();
     const now = new Date();
     const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
     const fourteenDaysAgo = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000);
