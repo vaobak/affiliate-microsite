@@ -97,6 +97,12 @@ export async function addProductToCollection(collectionId, product) {
       category: product.category || 'Uncategorized',
       badge: product.badge || ''
     });
+    
+    console.log('Product added, starting renumber...');
+    // Auto-renumber products to keep sequential IDs
+    const renumberResult = await api.renumberProductIds(collectionId);
+    console.log('Renumber result after add:', renumberResult);
+    
     return result;
   } catch (error) {
     console.error('Error adding product:', error);
