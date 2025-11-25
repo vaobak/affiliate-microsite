@@ -44,6 +44,14 @@ export default function Dashboard() {
     loadAllData();
   }, []);
 
+  // Load dependent data when collections change
+  useEffect(() => {
+    if (collections.length > 0) {
+      loadLowPerformingProducts();
+      loadCategoryDistribution();
+    }
+  }, [collections]);
+
   const loadAllData = async () => {
     try {
       setLoading(true);
@@ -58,10 +66,6 @@ export default function Dashboard() {
       // Load chart data
       await loadChartData();
       await loadCollectionPerformanceData();
-      
-      // Load other data
-      loadLowPerformingProducts();
-      loadCategoryDistribution();
       
       setLoading(false);
     } catch (err) {
@@ -308,7 +312,7 @@ export default function Dashboard() {
     const fourteenDaysAgo = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000);
     
     return collections.map(collection => {
-      const products = collection.products || [];
+      const products = Array.isArray(collection.products) ? collection.products : [];
       const totalClicks = products.reduce((sum, p) => sum + (p.clicks || 0), 0);
       
       // Calculate clicks for last 7 days (current period)
