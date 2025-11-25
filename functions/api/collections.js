@@ -55,6 +55,14 @@ export async function onRequestDelete({ request, env }) {
   try {
     const { id } = await request.json();
     
+    // Prevent deleting home collection
+    if (id === 'home') {
+      return new Response(JSON.stringify({ error: 'Cannot delete default home collection' }), {
+        status: 403,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+    
     // Delete collection (CASCADE will delete related data)
     await env.DB.prepare(
       'DELETE FROM collections WHERE id = ? AND is_default = 0'
