@@ -33,7 +33,9 @@ export async function getDefaultCollection() {
 // Add new collection
 export async function addCollection(collection) {
   try {
+    console.log('Adding collection with data:', collection);
     const result = await api.createCollection(collection);
+    console.log('Collection added:', result);
     return result;
   } catch (error) {
     console.error('Error adding collection:', error);
@@ -44,7 +46,9 @@ export async function addCollection(collection) {
 // Update collection
 export async function updateCollection(id, updates) {
   try {
+    console.log('Updating collection', id, 'with data:', updates);
     await api.updateCollection(id, updates);
+    console.log('Collection updated successfully');
     return true;
   } catch (error) {
     console.error('Error updating collection:', error);

@@ -4,6 +4,7 @@ import { trackPageView } from '../utils/storage';
 import { getCollectionBySlug, getDefaultCollection, getCollectionProducts } from '../utils/collections';
 import { trackCollectionView } from '../utils/analytics';
 import ProductCard from '../components/ProductCard';
+import EmptyState from '../components/EmptyState';
 import { getTheme, getPatternStyle } from '../utils/themes';
 
 export default function Home() {
@@ -101,12 +102,12 @@ export default function Home() {
       )}
 
       {/* Header */}
-      <header className={`bg-white/80 backdrop-blur-sm shadow-sm border-b-4 ${theme.border} relative z-10`}>
-        <div className="max-w-6xl mx-auto px-4 py-6">
-          <h1 className={`text-3xl font-bold bg-gradient-to-r ${theme.gradient} bg-clip-text text-transparent`}>
+      <header className={`bg-white/80 backdrop-blur-md shadow-sm border-b-4 ${theme.border} relative z-10 animate-slide-up`}>
+        <div className="max-w-6xl mx-auto px-4 py-8">
+          <h1 className={`text-4xl font-display font-bold bg-gradient-to-r ${theme.gradient} bg-clip-text text-transparent tracking-tight leading-tight mb-3`}>
             {collection?.name || 'Produk Pilihan'}
           </h1>
-          <p className="text-gray-600 mt-2">
+          <p className="text-gray-600 text-lg font-sans leading-relaxed">
             {collection?.description || 'Temukan produk terbaik untuk kebutuhan Anda'}
           </p>
         </div>
@@ -120,42 +121,34 @@ export default function Home() {
             <p className="text-gray-600">Loading products...</p>
           </div>
         ) : products.length === 0 ? (
-          <div className="text-center py-20">
-            <div className="w-24 h-24 mx-auto mb-6 bg-gray-100 rounded-full flex items-center justify-center">
-              <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-              </svg>
-            </div>
-            <h2 className="text-2xl font-semibold text-gray-700 mb-2">
-              Belum Ada Produk
-            </h2>
-            <p className="text-gray-500">
-              Produk akan muncul di sini setelah ditambahkan
-            </p>
-          </div>
+          <EmptyState 
+            theme={collection?.theme || 'blue'}
+            message="Belum Ada Produk"
+            description="Produk akan muncul di sini setelah ditambahkan"
+          />
         ) : (
           <>
             {/* Range Navigation - Only show if more than 100 products */}
             {products.length > ITEMS_PER_PAGE && (
-              <div className="mb-6">
-                <div className="bg-white rounded-xl shadow-md p-4 border border-gray-200">
+              <div className="mb-8 animate-fade-in">
+                <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg p-5 border border-gray-200">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-sm font-semibold text-gray-700 mr-2">Pilih Range:</span>
+                    <span className="text-sm font-display font-semibold text-gray-700 mr-2">Pilih Range:</span>
                     {getRangeButtons().map((btn) => (
                       <button
                         key={btn.index}
                         onClick={() => goToRange(btn.index)}
-                        className={`px-4 py-2 rounded-lg font-medium text-sm transition-all ${
+                        className={`px-4 py-2 rounded-xl font-medium text-sm transition-all duration-300 ${
                           currentRange === btn.index
-                            ? `bg-gradient-to-r ${theme.gradient} text-white shadow-md`
-                            : `bg-white ${theme.text} border ${theme.border} ${theme.hover}`
+                            ? `bg-gradient-to-r ${theme.gradient} text-white shadow-md hover:shadow-lg transform hover:scale-105`
+                            : `bg-white ${theme.text} border ${theme.border} ${theme.hover} hover:shadow-md`
                         }`}
                       >
                         {btn.start}-{btn.end}
                       </button>
                     ))}
                   </div>
-                  <div className="mt-3 text-xs text-gray-500">
+                  <div className="mt-3 text-xs text-gray-500 font-sans">
                     Menampilkan produk {startIndex + 1}-{Math.min(endIndex, products.length)} dari {products.length} total produk
                   </div>
                 </div>
@@ -163,24 +156,29 @@ export default function Home() {
             )}
 
             {/* Products List */}
-            <div className="space-y-3">
-              {currentProducts.map((product) => (
-                <ProductCard key={product.id} product={product} collectionId={collection?.id} theme={collection?.theme || 'blue'} />
+            <div className="space-y-4">
+              {currentProducts.map((product, index) => (
+                <div 
+                  key={product.id}
+                  style={{ animationDelay: `${index * 0.05}s` }}
+                >
+                  <ProductCard product={product} collectionId={collection?.id} theme={collection?.theme || 'blue'} />
+                </div>
               ))}
             </div>
 
             {/* Bottom Navigation - Only show if more than 100 products */}
             {products.length > ITEMS_PER_PAGE && (
-              <div className="mt-8">
-                <div className="bg-white rounded-xl shadow-md p-4 border border-gray-200">
+              <div className="mt-10 animate-fade-in">
+                <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg p-5 border border-gray-200">
                   <div className="flex items-center justify-between flex-wrap gap-4">
                     <button
                       onClick={() => goToRange(Math.max(0, currentRange - 1))}
                       disabled={currentRange === 0}
-                      className={`px-4 py-2 rounded-lg font-medium text-sm transition-all flex items-center gap-2 ${
+                      className={`px-5 py-2.5 rounded-xl font-display font-medium text-sm transition-all duration-300 flex items-center gap-2 ${
                         currentRange === 0
                           ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                          : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 hover:border-blue-400'
+                          : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 hover:border-blue-400 hover:shadow-md transform hover:scale-105'
                       }`}
                     >
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -189,17 +187,17 @@ export default function Home() {
                       Previous
                     </button>
                     
-                    <span className="text-sm text-gray-600 font-medium">
+                    <span className="text-sm text-gray-600 font-display font-semibold">
                       Range {currentRange + 1} of {totalRanges}
                     </span>
 
                     <button
                       onClick={() => goToRange(Math.min(totalRanges - 1, currentRange + 1))}
                       disabled={currentRange === totalRanges - 1}
-                      className={`px-4 py-2 rounded-lg font-medium text-sm transition-all flex items-center gap-2 ${
+                      className={`px-5 py-2.5 rounded-xl font-display font-medium text-sm transition-all duration-300 flex items-center gap-2 ${
                         currentRange === totalRanges - 1
                           ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                          : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 hover:border-blue-400'
+                          : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 hover:border-blue-400 hover:shadow-md transform hover:scale-105'
                       }`}
                     >
                       Next
@@ -216,9 +214,9 @@ export default function Home() {
       </main>
 
       {/* Footer */}
-      <footer className="bg-white border-t border-gray-100 mt-20">
-        <div className="max-w-6xl mx-auto px-4 py-6 text-center text-gray-600">
-          <p>© 2025 Affiliate Microsite. All rights reserved.</p>
+      <footer className="bg-white/80 backdrop-blur-sm border-t border-gray-200 mt-20">
+        <div className="max-w-6xl mx-auto px-4 py-8 text-center">
+          <p className="text-gray-600 font-sans text-sm">© 2025 Affiliate Microsite. All rights reserved.</p>
         </div>
       </footer>
     </div>
